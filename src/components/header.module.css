@@ -1,0 +1,12 @@
+.header__wrap {
+    background-color: beige;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.header_logo {
+    flex: 0 0 150px;
+        
+}
