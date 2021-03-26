@@ -1,6 +1,7 @@
 module.exports = {
   siteMetadata: {
     title: "whatpull",
+    siteUrl: "https://www.whatpull.com"
   },
   plugins: [
     "gatsby-plugin-react-helmet",
@@ -13,6 +14,12 @@ module.exports = {
         path: "./src/pages/",
       },
       __key: "pages",
+    },
+    {
+      resolve: `gatsby-plugin-s3`,
+      options: {
+        bucketName: "whatpull.com",
+      },
     },
   ],
 };
