@@ -1,12 +1,13 @@
 .header__wrap {
-    background-color: beige;
     height: 50px;
     display: flex;
     align-items: center;
-    padding: 0 20px;
+    border: 1px solid #161616;
 }
 
-.header_logo {
-    flex: 0 0 150px;
-        
+.header__logo {
+    flex: 0 0 200px;
+    height: 50px;
+    border: 1px solid #161616;
+    background-color: #161616;
 }
