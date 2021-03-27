@@ -8,7 +8,7 @@ export default function Header() {
     let raf = useRef();
     let rafStartTime = useRef();
     let defaultText = useRef('Design by Whatpull');
-    let patternImage = useRef(new Image(200, 50));
+    let patternImage = useRef();
 
     useEffect(() => {
         const clearContext = () => {
@@ -33,7 +33,7 @@ export default function Header() {
         const animate = time => {
             if(typeof rafStartTime.current === "undefined") rafStartTime.current = time;
             const progress = time - rafStartTime.current;
-            const drawContext_text_width = context.measureText(defaultText).width + 200;
+            const drawContext_text_width = context.measureText(defaultText).width + 250;
             const drawContext_max_x = 200;
             const drawContext_x = Math.min((drawContext_text_width * -1) + ((progress / 10) % (drawContext_max_x + drawContext_text_width)), drawContext_max_x);
             const drawContext_y = 25;
@@ -53,25 +53,24 @@ export default function Header() {
         }
 
         const loadImage = (callback) => {
+            if(typeof patternImage.current === "undefined") patternImage.current = new Image(200, 50);
             patternImage.current.onload = function() {
                 if(typeof callback === "function") callback();
             }
             patternImage.current.src = '/pattern.jpeg';
         }
 
-        loadImage(() => {
-            if(canvas) {
-                if(typeof context === "undefined") {
-                    setContext(canvas.current.getContext("2d"));
-                }
-                if(context) {
-                    loadImage(() => {
-                        drawContext(0, 25);
-                        startAnimation();
-                    });
-                }
+        if(canvas) {
+            if(typeof context === "undefined") {
+                setContext(canvas.current.getContext("2d"));
             }
-        });
+            if(context) {
+                loadImage(() => {
+                    drawContext(0, 25);
+                    startAnimation();
+                });
+            }
+        }
 
         return() => {
             if(canvas && context) {
