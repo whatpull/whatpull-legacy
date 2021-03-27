@@ -2,11 +2,25 @@
     height: 50px;
     display: flex;
     align-items: center;
-    background-color: #161616;
+    background-color: #252525;
 }
 
 .header__logo {
     flex: 0 0 200px;
     height: 50px;
-    background-color: #161616;
+    background-color: #252525;
+}
+
+.header__logoIcon {
+    flex: 1;
+    height: 50px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.header__logoIcon img {
+    width: auto;
+    height: 40px;
+    margin-right: 5px;
 }
