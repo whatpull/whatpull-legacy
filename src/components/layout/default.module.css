@@ -1,0 +1,23 @@
+.layout__default--wrap {
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+    height: 100vh;
+    color: #ffffff;
+}
+
+.layout__default--head {
+    background-color: #161616;
+}
+
+.layout__default--body {
+    flex: 1;
+    background-color: #242424;
+}
+
+.layout__default--foot {
+    flex: 0;
+    background-color: #161616;
+    font-size: 12px;
+    padding: 10px;
+}
