@@ -7,17 +7,18 @@
 }
 
 .layout__default--head {
-    background-color: #161616;
+    background-color: #242424;
 }
 
 .layout__default--body {
     flex: 1;
     background-color: #242424;
+    overflow: hidden;
 }
 
 .layout__default--foot {
-    flex: 0;
-    background-color: #161616;
+    background-color: #242424;
     font-size: 12px;
     padding: 10px;
+    color: rgba(255, 255, 255, 0.5);
 }

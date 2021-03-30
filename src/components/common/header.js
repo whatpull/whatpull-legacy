@@ -79,6 +79,7 @@ export default function Header() {
             if(canvas && context) {
                 cancelAnimation();
                 clearContext();
+                // resource 자원 낭비 확인
             }
         }
     }, [context]);
