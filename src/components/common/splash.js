@@ -2,14 +2,20 @@ import React, { useState, useEffect, useRef } from 'react'
 import * as style from './splash.module.css'
 
 export default function Splash() {
+    const [context, setContext] = useState();
     const wrap = useRef();
     const canvas = useRef();
+    const svg = useRef();
     const movieSlatePattern = useRef();
-    const [context, setContext] = useState();
+    const movieSlatePatternReverse = useRef();
+    const patternSlateImage = useRef();
+    const raf = useRef();
+    const rafStartTime = useRef();
+    const movieSlateAnimationSpeed = useRef(1);
 
     useEffect(() => {
         const clearContext = () => {
-            context.clearRect(0, 0, canvas.current.width, canvas.current.height);
+            if(canvas.current) context.clearRect(0, 0, canvas.current.width, canvas.current.height);
             context.beginPath();
         }
 
@@ -25,57 +31,116 @@ export default function Splash() {
             return height * ratio;
         }
 
-        const drawContext = () => {
+        const drawContext = (progress) => {
             context.strokeStyle = '#ffffff';
             context.fillStyle = '#ffffff';
-            const centerX = (context.canvas.width / 2);
-            const centerY = (context.canvas.height / 2);
+            const centerX = context.canvas.width / 2;
+            const centerY = context.canvas.height / 2;
             drawMovieSlateBody(centerX, centerY);
-            drawMovieSlateHead(centerX, centerY);
+            drawMovieSlateHead(centerX, centerY, progress);
+            drawMovieSlateHeadConnector(centerX, centerY);
         }
 
         const drawMovieSlateBody = (centerX, centerY) => {
-            const margin = 20;
             const width = 250;
             const height = 170;
-            const relative_width = getRelativeWidth(width, margin);
-            const ratio = relative_width/width;
-            const relative_height = getRelativeHeight(height, ratio);
-            const x = centerX - (relative_width / 2);
-            const y = centerY - (relative_height / 2);
+            const x = centerX - (width / 2);
+            const y = centerY - (height / 2);
             const radius = 6;
             const type = 'fill';
 
-            drawRoundedRectangle(x+5, y+5, relative_width, relative_height, radius, type, '#121212', 0.3);
-            drawRoundedRectangle(x, y, relative_width, relative_height, radius, type, '#121212', 1);
+            drawRoundedRectangle(x+5, y-10, width, height+15, radius, type, '#0E1013', 0.3);
+            drawRoundedRectangle(x, y, width, height, radius, type, '#0E1013', 1);
 
+            context.save();
             context.beginPath();
             context.fillStyle = 'rgba(255, 255, 255, 1)';
-            context.font = '12px Roboto';
+            context.font = '14px Roboto';
             context.textBaseline = 'middle';
-            context.fillText('Design By Whatpull', x+120, y+(175-30));
-            context.fill();
+            context.fillText('Design By Whatpull', x+105, y+(145));
+            context.restore();
         }
 
-        const drawMovieSlateHead = (centerX, centerY) => {
-            const margin = 20;
-            const width = 252;
-            const height = 30;
-            const relative_width = getRelativeWidth(width, margin);
-            const ratio = relative_width/width;
-            const relative_height = getRelativeHeight(height, ratio);
-            const x = centerX - (relative_width / 2);
-            const y = centerY - (getRelativeHeight(210, ratio) / 2);
+        const drawMovieSlateHead = (centerX, centerY, progress) => {
+            const width = 250;
+            const height = 25;
+            const x = centerX - (width / 2);
+            const y = centerY - (190 / 2);
             const radius = 2;
             const type = 'fill';
-            const rotate = -15 * Math.PI / 180; // TODO 해당 각도를 수정하여 슬레이트를 적용한다.(애니메이션)
-            
-            drawRoundedRectangle(x, y+5, relative_width, relative_height, radius, type, '#121212', 0.1);
-            drawRoundedRectangle(x, y, relative_width, relative_height, radius, type, movieSlatePattern.current, 1);
-            context.translate(x, y);
-            context.rotate(rotate);
-            context.translate(-x, -y-25);
-            drawRoundedRectangle(x, y, relative_width, relative_height, radius, type, movieSlatePattern.current, 1, rotate);
+            const degree = -1 * (20 - progress); // 20 ~ 0 
+            const rotate = degree * Math.PI / 180;
+
+            context.save();
+            drawRoundedRectangle(x-1, y+5, width, height, radius, type, '#212121', 0.1);
+            drawRoundedRectangle(x-1, y, width, height, radius, type, movieSlatePattern.current, 1);
+            context.restore();
+
+            context.save();
+            // context.translate(x, y);
+            // context.rotate(rotate);
+            // context.translate(-x, -y-26);
+            // TODO. 버그(윈도으 리사이징시 사라지는 문제)
+            drawRoundedRectangle(x+(degree/-3), y-26, width, height, radius, type, movieSlatePattern.current, 1, rotate);
+            context.restore();
+        }
+
+        const drawMovieSlateHeadConnector = (centerX, centerY) => {
+            const width = 30;
+            const height = 55;
+            const x = centerX - (width / 2) - 110;
+            const y = centerY - (height / 2) - 95;
+
+            context.save();
+            context.beginPath();
+            context.lineWidth = 5;
+            context.strokeStyle = '#121212'
+            context.fillStyle = '#0E1013';
+            context.moveTo(x, y);
+            context.lineTo(x + 20, y + 1);
+            context.lineTo(x + width, y + (height / 2));
+            context.lineTo(x + 20, y + height - 2);
+            context.lineTo(x, y + height);
+            context.closePath();
+            context.stroke();
+            context.fill();
+            context.restore();
+
+            // 나사 [top, left]
+            context.save();
+            context.beginPath();
+            context.fillStyle = '#282A2D';
+            context.moveTo(x, y);
+            context.arc(x + 5, y + 8, 2, 0, Math.PI * 2, true);
+            context.fill();
+            context.restore();
+
+            // 나사 [top, right]
+            context.save();
+            context.beginPath();
+            context.fillStyle = '#282A2D';
+            context.moveTo(x, y);
+            context.arc(x + 18, y + 13, 2, 0, Math.PI * 2, true);
+            context.fill();
+            context.restore();
+
+            // 나사 [bottom, right]
+            context.save();
+            context.beginPath();
+            context.fillStyle = '#282A2D';
+            context.moveTo(x, y);
+            context.arc(x + 18, y + 40, 2, 0, Math.PI * 2, true);
+            context.fill();
+            context.restore();
+
+            // 나사 [bottom, left]
+            context.save();
+            context.beginPath();
+            context.fillStyle = '#282A2D';
+            context.moveTo(x, y);
+            context.arc(x + 5, y + 45, 2, 0, Math.PI * 2, true);
+            context.fill();
+            context.restore();
         }
 
         /**
@@ -84,6 +149,7 @@ export default function Splash() {
          * @param {*} type (타입 : line(선), fill(채우기))
          */
         const drawRoundedRectangle = (x, y, width, height, radius, type, color, alpha, rotate) => {
+            context.save();
             context.beginPath();
             context.moveTo(x + (radius * 2), y);
             context.arcTo(x + width, y, x + width, y + (radius * 2), radius); // top, right
@@ -103,41 +169,68 @@ export default function Splash() {
                 context.strokeStyle = color;
                 context.stroke();
             }
+            context.restore();
         }
 
-        const initCanvas = () => { // canvas 사이즈 조절
+        const initCanvas = (progress) => {
+            clearContext();
+            const ratio = 1.3;
+            context.canvas.width = canvas.current.clientWidth * ratio;
+            context.canvas.height = canvas.current.clientHeight * ratio;
+            drawContext(progress);
             context.imageSmoothingEnabled = true;
             context.translate(0.5, 0.5);
-            context.canvas.width = canvas.current.clientWidth;
-            context.canvas.height = canvas.current.clientHeight;
-            clearContext();
-            drawContext();
         }
 
+        // 동적 변화에 따른 패턴의 위치값 수정현상 파악 및 해결
         const initPattern = () => {
             const pattern_canvas = document.createElement('canvas');
-            pattern_canvas.width = 40;
-            pattern_canvas.height = 40;
+            pattern_canvas.width = 260;
+            pattern_canvas.height = 260;
             const pattern_context = pattern_canvas.getContext('2d');
-            drawPattern(0, 0, 40, 40, pattern_context, '#EEEEEE', '#212121');
-            movieSlatePattern.current = pattern_context.createPattern(pattern_canvas, "repeat");
+            movieSlatePattern.current = pattern_context.createPattern(patternSlateImage.current, "repeat");
+            movieSlatePatternReverse.current = pattern_context.createPattern(patternSlateImage.current, "repeat");
+            // changePattern(movieSlatePattern.current, 0, 0, 0);
+            // changePattern(movieSlatePatternReverse.current, 90, 0, 0);
+
         }
 
-        // TODO 패턴 개발
-        const drawPattern = (x, y, width, height, context, rectColor, lineColor) => {
-            context.beginPath();
-            context.fillStyle = rectColor;
-            context.fillRect(x, y, width, height);
+        const changePattern = (pattern, degree, x, y) => {
+            const matrix = svg.current.createSVGMatrix();
+            pattern.setTransform(matrix.rotate(degree).translate(x, y));
+            return pattern;
+        }
 
-            context.beginPath();
-            context.fillStyle = lineColor;
-            context.lineWidth = 1;
-            context.moveTo(20, 0);
-            context.lineTo(40, 0);
-            context.lineTo(20, 40);
-            context.lineTo(0, 40);
-            context.closePath();
-            context.fill();
+        const animate = time => {
+            if(typeof rafStartTime.current === "undefined") rafStartTime.current = time;
+            const progress = time - rafStartTime.current;
+            const degree = 20;
+            const calculate = Math.min(((progress + (movieSlateAnimationSpeed.current++)*5) / degree), degree);
+            initCanvas(calculate);
+            if(calculate === degree) { // 초기화
+                cancelAnimation();
+                movieSlateAnimationSpeed.current = 1;
+            } else {
+                startAnimation();
+            }
+        }
+
+        const startAnimation = () => {
+            raf.current = requestAnimationFrame(animate);
+        }
+
+        const cancelAnimation = () => {
+            cancelAnimationFrame(raf.current);
+            raf.current = undefined;
+            rafStartTime.current = undefined;
+        }
+
+        const loadImage = (callback) => {
+            if(typeof patternSlateImage.current === "undefined") patternSlateImage.current = new Image(260, 260);
+            patternSlateImage.current.onload = function() {
+                if(typeof callback === "function") callback();
+            }
+            patternSlateImage.current.src = '/pattern_slate.png';
         }
 
         if(canvas) {
@@ -145,15 +238,19 @@ export default function Splash() {
                 setContext(canvas.current.getContext("2d"));
             }
             if(context) {
-                initPattern();
-                window.addEventListener('resize', initCanvas);
-                initCanvas();
+                loadImage(() => {
+                    initPattern();
+                    initCanvas(20);
+                    startAnimation();
+                    window.addEventListener('resize', initCanvas);
+                });
             }
         }
 
         return() => {
             window.removeEventListener('resize', initCanvas);
             if(canvas && context) {
+                cancelAnimation();
                 clearContext();
             }
         }
@@ -167,6 +264,7 @@ export default function Splash() {
                 ref={canvas}
                 className={style.splash__canvasFull}>
             </canvas>
+            <svg ref={svg}></svg>
         </div>
     )
 }

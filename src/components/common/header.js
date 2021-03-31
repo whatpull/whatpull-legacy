@@ -3,14 +3,14 @@ import * as style from './header.module.css'
 import icon from '../../images/icon.png'
 
 export default function Header() {
-    const canvas = useRef();
     const [context, setContext] = useState();
+    const canvas = useRef();
     // Ref Hook은 DOM Object를 관리하는 것 외에 컴포넌트 내에서 조회 수정할 수 있는 변수를 관리하는 용도가 있습니다.
     // (변수 값이 변경된다고 컴포넌트가 리렌딩 되지 않습니다.) 
-    let raf = useRef();
-    let rafStartTime = useRef();
-    let defaultText = useRef('Design by Whatpull');
-    let patternImage = useRef();
+    const raf = useRef();
+    const rafStartTime = useRef();
+    const defaultText = useRef('Design by Whatpull');
+    const patternImage = useRef();
 
     useEffect(() => {
         const clearContext = () => {
@@ -69,6 +69,8 @@ export default function Header() {
             }
             if(context) {
                 loadImage(() => {
+                    cancelAnimation();
+                    clearContext();
                     drawContext(0, 25);
                     startAnimation();
                 });
@@ -79,7 +81,6 @@ export default function Header() {
             if(canvas && context) {
                 cancelAnimation();
                 clearContext();
-                // resource 자원 낭비 확인
             }
         }
     }, [context]);
