@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import * as style from './splash.module.css'
 
-export default function Splash() {
+export default function Splash({ mount }) {
     const [context, setContext] = useState();
     const wrap = useRef();
     const canvas = useRef();
@@ -213,6 +213,8 @@ export default function Splash() {
             }
             if(context) {
                 loadImage(() => {
+                    cancelAnimation();
+                    clearContext();
                     initCanvas(20);
                     startAnimation();
                     window.addEventListener('resize', initCanvas);
@@ -227,12 +229,12 @@ export default function Splash() {
                 clearContext();
             }
         }
-    }, [context])
+    }, [context, mount])
 
     return(
         <div
-            ref={wrap} 
-            className={style.splash__canvasWrap}>
+            ref={wrap}
+            className={[style.splash__canvasWrap, mount ? style.splash__canvasWrapHidden : ''].join(' ')}>
             <canvas 
                 ref={canvas}
                 className={style.splash__canvasFull}>

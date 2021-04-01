@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import TransitionLink from "gatsby-plugin-transition-link"
 import * as style from './header.module.css'
 import icon from '../../images/icon.png'
 
@@ -14,8 +15,7 @@ export default function Header() {
 
     useEffect(() => {
         const clearContext = () => {
-            context.clearRect(0, 0, canvas.current.width, canvas.current.height);
-            context.beginPath();
+            if(canvas.current) context.clearRect(0, 0, canvas.current.width, canvas.current.height);
         }
     
         const drawContext = (x, y) => {
@@ -90,12 +90,33 @@ export default function Header() {
     return (
         <div
             className={style.header__wrap}>
-            <canvas
-                ref={canvas}
-                className={style.header__logo}
-                width="200px"
-                height="50px">
-            </canvas>
+            <TransitionLink
+                to="/"
+                exit={{
+                    length: 1
+                }}
+                entry={{
+                    delay: 0.6
+                }}>
+                <canvas
+                    ref={canvas}
+                    className={style.header__logo}
+                    width="200px"
+                    height="50px">
+                </canvas>
+            </TransitionLink>
+            <TransitionLink
+                to="/animation/01"
+                exit={{
+                    length: 1
+                }}
+                entry={{
+                    delay: 0.6
+                }}>
+                <div className={style.header__menuItem}>
+                    01
+                </div>
+            </TransitionLink>
             <div className={style.header__logoIcon}>
                 <img src={icon} alt="symbol icon" />
             </div>
