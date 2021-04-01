@@ -6,29 +6,16 @@ export default function Splash() {
     const wrap = useRef();
     const canvas = useRef();
     const svg = useRef();
-    const movieSlatePattern = useRef();
-    const movieSlatePatternReverse = useRef();
     const patternSlateImage = useRef();
+    const patternSlateReverseImage = useRef();
     const raf = useRef();
     const rafStartTime = useRef();
     const movieSlateAnimationSpeed = useRef(1);
+    const ratio = 1.3;
 
     useEffect(() => {
         const clearContext = () => {
             if(canvas.current) context.clearRect(0, 0, canvas.current.width, canvas.current.height);
-            context.beginPath();
-        }
-
-        const getRelativeWidth = (width, margin) => {
-            let result = width - margin;
-            if(width > context.canvas.width) {
-                result = context.canvas.width - margin;
-            }
-            return result;
-        }
-
-        const getRelativeHeight = (height, ratio) => {
-            return height * ratio;
         }
 
         const drawContext = (progress) => {
@@ -72,16 +59,19 @@ export default function Splash() {
             const rotate = degree * Math.PI / 180;
 
             context.save();
+            context.beginPath();
             drawRoundedRectangle(x-1, y+5, width, height, radius, type, '#212121', 0.1);
-            drawRoundedRectangle(x-1, y, width, height, radius, type, movieSlatePattern.current, 1);
+            drawRoundedRectangle(x-1, y, width, height, radius, type, '#FFFFFF', 1);
+            context.drawImage(patternSlateImage.current, x-1, y, width+1, height);
             context.restore();
 
             context.save();
-            // context.translate(x, y);
-            // context.rotate(rotate);
-            // context.translate(-x, -y-26);
-            // TODO. 버그(윈도으 리사이징시 사라지는 문제)
-            drawRoundedRectangle(x+(degree/-3), y-26, width, height, radius, type, movieSlatePattern.current, 1, rotate);
+            context.beginPath();
+            context.translate(x, y);
+            context.rotate(rotate);
+            context.translate(-x, -y);
+            drawRoundedRectangle(x-1, y-26, width, height, radius, type, '#FFFFFF', 1);
+            context.drawImage(patternSlateReverseImage.current, x-1, y-26, width+1, height);
             context.restore();
         }
 
@@ -106,10 +96,11 @@ export default function Splash() {
             context.fill();
             context.restore();
 
+            const boltColor = 'rgba(255, 255, 255, 0.06)';
             // 나사 [top, left]
             context.save();
             context.beginPath();
-            context.fillStyle = '#282A2D';
+            context.fillStyle = boltColor;
             context.moveTo(x, y);
             context.arc(x + 5, y + 8, 2, 0, Math.PI * 2, true);
             context.fill();
@@ -118,7 +109,7 @@ export default function Splash() {
             // 나사 [top, right]
             context.save();
             context.beginPath();
-            context.fillStyle = '#282A2D';
+            context.fillStyle = boltColor;
             context.moveTo(x, y);
             context.arc(x + 18, y + 13, 2, 0, Math.PI * 2, true);
             context.fill();
@@ -127,7 +118,7 @@ export default function Splash() {
             // 나사 [bottom, right]
             context.save();
             context.beginPath();
-            context.fillStyle = '#282A2D';
+            context.fillStyle = boltColor;
             context.moveTo(x, y);
             context.arc(x + 18, y + 40, 2, 0, Math.PI * 2, true);
             context.fill();
@@ -136,7 +127,7 @@ export default function Splash() {
             // 나사 [bottom, left]
             context.save();
             context.beginPath();
-            context.fillStyle = '#282A2D';
+            context.fillStyle = boltColor;
             context.moveTo(x, y);
             context.arc(x + 5, y + 45, 2, 0, Math.PI * 2, true);
             context.fill();
@@ -148,7 +139,7 @@ export default function Splash() {
          * 위치 좌표(x, y), 도형 크기(width, height)
          * @param {*} type (타입 : line(선), fill(채우기))
          */
-        const drawRoundedRectangle = (x, y, width, height, radius, type, color, alpha, rotate) => {
+        const drawRoundedRectangle = (x, y, width, height, radius, type, color, alpha) => {
             context.save();
             context.beginPath();
             context.moveTo(x + (radius * 2), y);
@@ -160,8 +151,7 @@ export default function Splash() {
             context.lineTo(x, y + height - (radius * 2));
             context.arcTo(x, y, x + (radius * 2), y, radius); // top, left
             context.lineTo(x + (radius * 2), y);
-            context.globalAlpha = alpha;
-            if(rotate) context.rotate(rotate);
+            if(typeof alpha === "number") context.globalAlpha = alpha;
             if(type === 'fill') {
                 context.fillStyle = color;
                 context.fill();
@@ -173,32 +163,12 @@ export default function Splash() {
         }
 
         const initCanvas = (progress) => {
-            clearContext();
-            const ratio = 1.3;
             context.canvas.width = canvas.current.clientWidth * ratio;
             context.canvas.height = canvas.current.clientHeight * ratio;
+            clearContext();
             drawContext(progress);
             context.imageSmoothingEnabled = true;
             context.translate(0.5, 0.5);
-        }
-
-        // 동적 변화에 따른 패턴의 위치값 수정현상 파악 및 해결
-        const initPattern = () => {
-            const pattern_canvas = document.createElement('canvas');
-            pattern_canvas.width = 260;
-            pattern_canvas.height = 260;
-            const pattern_context = pattern_canvas.getContext('2d');
-            movieSlatePattern.current = pattern_context.createPattern(patternSlateImage.current, "repeat");
-            movieSlatePatternReverse.current = pattern_context.createPattern(patternSlateImage.current, "repeat");
-            // changePattern(movieSlatePattern.current, 0, 0, 0);
-            // changePattern(movieSlatePatternReverse.current, 90, 0, 0);
-
-        }
-
-        const changePattern = (pattern, degree, x, y) => {
-            const matrix = svg.current.createSVGMatrix();
-            pattern.setTransform(matrix.rotate(degree).translate(x, y));
-            return pattern;
         }
 
         const animate = time => {
@@ -227,10 +197,14 @@ export default function Splash() {
 
         const loadImage = (callback) => {
             if(typeof patternSlateImage.current === "undefined") patternSlateImage.current = new Image(260, 260);
+            if(typeof patternSlateReverseImage.current === "undefined") patternSlateReverseImage.current = new Image(260, 260);
             patternSlateImage.current.onload = function() {
-                if(typeof callback === "function") callback();
+                patternSlateReverseImage.current.onload = function() {
+                    if(typeof callback === "function") callback();
+                }
+                patternSlateReverseImage.current.src = '/pattern_slate_top.png';
             }
-            patternSlateImage.current.src = '/pattern_slate.png';
+            patternSlateImage.current.src = '/pattern_slate_bottom.png';
         }
 
         if(canvas) {
@@ -239,7 +213,6 @@ export default function Splash() {
             }
             if(context) {
                 loadImage(() => {
-                    initPattern();
                     initCanvas(20);
                     startAnimation();
                     window.addEventListener('resize', initCanvas);

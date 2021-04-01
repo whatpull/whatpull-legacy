@@ -25,10 +25,12 @@ export default function Header() {
             context.textBaseline = 'middle';
             context.fillText(defaultText.current, x, y);
             context.fill();
+            context.restore();
 
+            context.save();
             context.beginPath();
             context.globalCompositeOperation="source-in";
-            context.drawImage(patternImage.current, 0, 0);
+            context.drawImage(patternImage.current, 0, 0, 250, (250 / patternImage.current.width) * patternImage.current.height);
             context.restore();
         }
 
@@ -56,11 +58,11 @@ export default function Header() {
         }
 
         const loadImage = (callback) => {
-            if(typeof patternImage.current === "undefined") patternImage.current = new Image(200, 50);
+            if(typeof patternImage.current === "undefined") patternImage.current = new Image(1200, 750);
             patternImage.current.onload = function() {
                 if(typeof callback === "function") callback();
             }
-            patternImage.current.src = '/pattern.jpeg';
+            patternImage.current.src = '/pattern_v1.jpeg';
         }
 
         if(canvas) {
