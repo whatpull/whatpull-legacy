@@ -68,7 +68,7 @@ export default function Splash({ mount }) {
             const y = centerY - (190 / 2);
             const radius = 2;
             const type = 'fill';
-            const degree = -1 * (maxDegree - progress); // 20 ~ 0 
+            const degree = -1 * (maxDegree - progress); // 20 ~ 0
             const rotate = degree * Math.PI / 180;
             const slateHeadItem = (x, y, position) => { // 슬레이트 아이템
                 context.save();
@@ -78,8 +78,7 @@ export default function Splash({ mount }) {
                     context.rotate(rotate);
                     context.translate(-x, -y);
                 }
-                drawRoundedRectangle(x, y+5, width, height, radius, type, '#212121', 0.1);
-                drawRoundedRectangle(x, y, width, height, radius, type, '#FFFFFF', 1);
+                drawRoundedRectangle(x, y+5, width, height, radius, type, '#121212', 0.5);
                 context.drawImage((position === 'top' ? patternSlateTopImage.current : patternSlateBottomImage.current), x, y, width+1, height);
                 context.restore();
             }

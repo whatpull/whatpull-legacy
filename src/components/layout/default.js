@@ -13,13 +13,13 @@ export default function DefaultLayout({ children, background }) {
                 <Header />
             </div>
             <div className={style.layout__defaultBody}>
-                <TransitionState>
+                {/* <TransitionState>
                     {({ TransitionStatus, exit, entry, mount }) => {
                         return(
                             <Splash mount={mount} />
                         )
                     }}
-                </TransitionState>
+                </TransitionState> */}
                 <div
                     style={{ background: background }} 
                     className={style.body__content}>
