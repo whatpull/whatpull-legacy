@@ -65,6 +65,7 @@ export default function Header() {
             patternImage.current.src = '/pattern_v1.jpeg';
         }
 
+        // 초기 호출 함수
         if(canvas) {
             if(typeof context === "undefined") {
                 setContext(canvas.current.getContext("2d"));

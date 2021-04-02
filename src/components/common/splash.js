@@ -6,21 +6,31 @@ export default function Splash({ mount }) {
     const wrap = useRef();
     const canvas = useRef();
     const svg = useRef();
-    const patternSlateImage = useRef();
-    const patternSlateReverseImage = useRef();
+    const patternSlateBottomImage = useRef();
+    const patternSlateTopImage = useRef();
     const raf = useRef();
     const rafStartTime = useRef();
     const movieSlateAnimationSpeed = useRef(1);
     const ratio = 1.3;
+    const maxDegree = 20;
 
     useEffect(() => {
+        const initCanvas = (progress) => {
+            context.canvas.width = canvas.current.clientWidth * ratio;
+            context.canvas.height = canvas.current.clientHeight * ratio;
+            clearContext();
+            drawContext(progress);
+            context.imageSmoothingEnabled = true;
+            context.translate(0.5, 0.5);
+        }
+
         const clearContext = () => {
             if(canvas.current) context.clearRect(0, 0, canvas.current.width, canvas.current.height);
         }
 
         const drawContext = (progress) => {
-            context.strokeStyle = '#ffffff';
-            context.fillStyle = '#ffffff';
+            context.strokeStyle = '#FFFFFF';
+            context.fillStyle = '#FFFFFF';
             const centerX = context.canvas.width / 2;
             const centerY = context.canvas.height / 2;
             drawMovieSlateBody(centerX, centerY);
@@ -39,13 +49,16 @@ export default function Splash({ mount }) {
             drawRoundedRectangle(x+5, y-10, width, height+15, radius, type, '#0E1013', 0.3);
             drawRoundedRectangle(x, y, width, height, radius, type, '#0E1013', 1);
 
-            context.save();
-            context.beginPath();
-            context.fillStyle = 'rgba(255, 255, 255, 1)';
-            context.font = '14px Roboto';
-            context.textBaseline = 'middle';
-            context.fillText('Design By Whatpull', x+105, y+(145));
-            context.restore();
+            const slateBodyDecoration = () => { // 바디 꾸미기(글씨)
+                context.save();
+                context.beginPath();
+                context.fillStyle = 'rgba(255, 255, 255, 1)';
+                context.font = '14px Roboto';
+                context.textBaseline = 'middle';
+                context.fillText('Design By Whatpull', x+105, y+(145));
+                context.restore();
+            }
+            slateBodyDecoration();
         }
 
         const drawMovieSlateHead = (centerX, centerY, progress) => {
@@ -55,24 +68,24 @@ export default function Splash({ mount }) {
             const y = centerY - (190 / 2);
             const radius = 2;
             const type = 'fill';
-            const degree = -1 * (20 - progress); // 20 ~ 0 
+            const degree = -1 * (maxDegree - progress); // 20 ~ 0 
             const rotate = degree * Math.PI / 180;
-
-            context.save();
-            context.beginPath();
-            drawRoundedRectangle(x-1, y+5, width, height, radius, type, '#212121', 0.1);
-            drawRoundedRectangle(x-1, y, width, height, radius, type, '#FFFFFF', 1);
-            context.drawImage(patternSlateImage.current, x-1, y, width+1, height);
-            context.restore();
-
-            context.save();
-            context.beginPath();
-            context.translate(x, y);
-            context.rotate(rotate);
-            context.translate(-x, -y);
-            drawRoundedRectangle(x-1, y-26, width, height, radius, type, '#FFFFFF', 1);
-            context.drawImage(patternSlateReverseImage.current, x-1, y-26, width+1, height);
-            context.restore();
+            const slateHeadItem = (x, y, position) => { // 슬레이트 아이템
+                context.save();
+                context.beginPath();
+                if(position === "top") {
+                    context.translate(x, y);
+                    context.rotate(rotate);
+                    context.translate(-x, -y);
+                }
+                drawRoundedRectangle(x, y+5, width, height, radius, type, '#212121', 0.1);
+                drawRoundedRectangle(x, y, width, height, radius, type, '#FFFFFF', 1);
+                context.drawImage((position === 'top' ? patternSlateTopImage.current : patternSlateBottomImage.current), x, y, width+1, height);
+                context.restore();
+            }
+            
+            slateHeadItem(x-1, y-26, 'top');
+            slateHeadItem(x-1, y, 'bottom');
         }
 
         const drawMovieSlateHeadConnector = (centerX, centerY) => {
@@ -80,65 +93,41 @@ export default function Splash({ mount }) {
             const height = 55;
             const x = centerX - (width / 2) - 110;
             const y = centerY - (height / 2) - 95;
-
-            context.save();
-            context.beginPath();
-            context.lineWidth = 5;
-            context.strokeStyle = '#121212'
-            context.fillStyle = '#0E1013';
-            context.moveTo(x, y);
-            context.lineTo(x + 20, y + 1);
-            context.lineTo(x + width, y + (height / 2));
-            context.lineTo(x + 20, y + height - 2);
-            context.lineTo(x, y + height);
-            context.closePath();
-            context.stroke();
-            context.fill();
-            context.restore();
-
             const boltColor = 'rgba(255, 255, 255, 0.06)';
-            // 나사 [top, left]
-            context.save();
-            context.beginPath();
-            context.fillStyle = boltColor;
-            context.moveTo(x, y);
-            context.arc(x + 5, y + 8, 2, 0, Math.PI * 2, true);
-            context.fill();
-            context.restore();
-
-            // 나사 [top, right]
-            context.save();
-            context.beginPath();
-            context.fillStyle = boltColor;
-            context.moveTo(x, y);
-            context.arc(x + 18, y + 13, 2, 0, Math.PI * 2, true);
-            context.fill();
-            context.restore();
-
-            // 나사 [bottom, right]
-            context.save();
-            context.beginPath();
-            context.fillStyle = boltColor;
-            context.moveTo(x, y);
-            context.arc(x + 18, y + 40, 2, 0, Math.PI * 2, true);
-            context.fill();
-            context.restore();
-
-            // 나사 [bottom, left]
-            context.save();
-            context.beginPath();
-            context.fillStyle = boltColor;
-            context.moveTo(x, y);
-            context.arc(x + 5, y + 45, 2, 0, Math.PI * 2, true);
-            context.fill();
-            context.restore();
+            const connectorBody = () => { // 컨넥터 몸
+                context.save();
+                context.beginPath();
+                context.lineWidth = 5;
+                context.strokeStyle = '#121212'
+                context.fillStyle = '#0E1013';
+                context.moveTo(x, y);
+                context.lineTo(x + 20, y + 1);
+                context.lineTo(x + width, y + (height / 2));
+                context.lineTo(x + 20, y + height - 2);
+                context.lineTo(x, y + height);
+                context.closePath();
+                context.stroke();
+                context.fill();
+                context.restore();
+            }
+            const connectorBolt = (x, y) => { // 컨넥터 나사
+                context.save();
+                context.beginPath();
+                context.fillStyle = boltColor;
+                context.moveTo(x, y);
+                context.arc(x, y, 2, 0, Math.PI * 2, true);
+                context.fill();
+                context.restore();
+            }
+            
+            connectorBody();
+            connectorBolt(x + 5, y + 8);    // 나사 [top, left]
+            connectorBolt(x + 18, y + 13);  // 나사 [top, right]
+            connectorBolt(x + 18, y + 40);  // 나사 [bottom, right]
+            connectorBolt(x + 5, y + 45);   // 나사 [bottom, left]
         }
 
-        /**
-         * 라운드 사각형
-         * 위치 좌표(x, y), 도형 크기(width, height)
-         * @param {*} type (타입 : line(선), fill(채우기))
-         */
+        /** @param {*} type (타입 : line(선), fill(채우기)) */
         const drawRoundedRectangle = (x, y, width, height, radius, type, color, alpha) => {
             context.save();
             context.beginPath();
@@ -162,19 +151,10 @@ export default function Splash({ mount }) {
             context.restore();
         }
 
-        const initCanvas = (progress) => {
-            context.canvas.width = canvas.current.clientWidth * ratio;
-            context.canvas.height = canvas.current.clientHeight * ratio;
-            clearContext();
-            drawContext(progress);
-            context.imageSmoothingEnabled = true;
-            context.translate(0.5, 0.5);
-        }
-
         const animate = time => {
             if(typeof rafStartTime.current === "undefined") rafStartTime.current = time;
             const progress = time - rafStartTime.current;
-            const degree = 20;
+            const degree = maxDegree;
             const calculate = Math.min(((progress + (movieSlateAnimationSpeed.current++)*5) / degree), degree);
             initCanvas(calculate);
             if(calculate === degree) { // 초기화
@@ -196,17 +176,18 @@ export default function Splash({ mount }) {
         }
 
         const loadImage = (callback) => {
-            if(typeof patternSlateImage.current === "undefined") patternSlateImage.current = new Image(260, 260);
-            if(typeof patternSlateReverseImage.current === "undefined") patternSlateReverseImage.current = new Image(260, 260);
-            patternSlateImage.current.onload = function() {
-                patternSlateReverseImage.current.onload = function() {
+            if(typeof patternSlateBottomImage.current === "undefined") patternSlateBottomImage.current = new Image(260, 260);
+            if(typeof patternSlateTopImage.current === "undefined") patternSlateTopImage.current = new Image(260, 260);
+            patternSlateBottomImage.current.onload = function() {
+                patternSlateTopImage.current.onload = function() {
                     if(typeof callback === "function") callback();
                 }
-                patternSlateReverseImage.current.src = '/pattern_slate_top.png';
+                patternSlateTopImage.current.src = '/pattern_slate_top.png';
             }
-            patternSlateImage.current.src = '/pattern_slate_bottom.png';
+            patternSlateBottomImage.current.src = '/pattern_slate_bottom.png';
         }
 
+        // 초기 호출 함수
         if(canvas) {
             if(typeof context === "undefined") {
                 setContext(canvas.current.getContext("2d"));
@@ -215,7 +196,7 @@ export default function Splash({ mount }) {
                 loadImage(() => {
                     cancelAnimation();
                     clearContext();
-                    initCanvas(20);
+                    initCanvas(maxDegree);
                     startAnimation();
                     window.addEventListener('resize', initCanvas);
                 });

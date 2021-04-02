@@ -15,7 +15,6 @@ export default function DefaultLayout({ children, background }) {
             <div className={style.layout__defaultBody}>
                 <TransitionState>
                     {({ TransitionStatus, exit, entry, mount }) => {
-                        console.log(mount);
                         return(
                             <Splash mount={mount} />
                         )
