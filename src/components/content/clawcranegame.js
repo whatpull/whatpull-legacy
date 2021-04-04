@@ -23,6 +23,7 @@ export default function ClawCraneGame() {
             context.globalCompositeOperation = 'source-atop';
             drawClawCraneGameHead(centerX, centerY);
             context.restore();
+            drawClawCraneGameFoot(centerX, centerY);
         }
 
         const drawClawCraneGameHead = (centerX, centerY) => {
@@ -51,11 +52,12 @@ export default function ClawCraneGame() {
             const radius = 6;
             const type = 'fill';
 
-            drawRoundedRectangle(x+5, y+5, width, height, radius, type, '#121212', 0.5);
+            drawRoundedRectangle(x+3, y+3, width, height, radius, type, '#121212', 0.5);
             drawRoundedRectangle(x, y, width, height, radius, type, '#009688', 1);
 
             drawClawCraneGameGlass(centerX, centerY);
             drawClawCraneGameControlBox(centerX, centerY);
+            drawClawCraneGameExitBox(centerX, centerY);
         }
 
         const drawClawCraneGameGlass = (centerX, centerY) => {
@@ -82,12 +84,92 @@ export default function ClawCraneGame() {
             context.beginPath();
             context.moveTo(x, y);
             context.lineTo(x + width, y);
-            context.lineTo(x + width + 30, y + height);
-            context.lineTo(x - 30, y + height);
+            context.lineTo(x + width + 25, y + height);
+            context.lineTo(x - 25, y + height);
             context.closePath();
             context.fillStyle = '#20B2AA';
             context.fill();
             context.restore();
+
+            const buttonBottom = (relativeX, relativeY) => {
+                const width = 20;
+                const height = 8;
+                const x = relativeX - (width / 2);
+                const y = relativeY - (height / 2);
+                const radius = 2;
+                const type = 'fill';
+
+                drawRoundedRectangle(x+1, y+2, width, height, radius, type, '#121212', 0.5);
+                drawRoundedRectangle(x, y, width, height, radius, type, '#121212', 1);
+            }
+
+            const joystick = (relativeX, relativeY) => {
+                const joystickBody = (relativeX, relativeY)=> {
+                    const width = 4;
+                    const height = 20;
+                    const x = relativeX - (width / 2);
+                    const y = relativeY - (height / 2);
+                    const radius = 2;
+                    const type = 'fill';
+                    drawRoundedRectangle(x+1, y+1, width, height, radius, type, '#121212', 0.5);
+                    drawRoundedRectangle(x, y, width, height, radius, type, '#EEEEEE', 1);
+                }
+                const joystickHead = (relativeX, relativeY) => {
+                    const radius = 8;
+                    const x = relativeX;
+                    const y = relativeY - radius * 2;
+                    
+                    context.save();
+                    context.beginPath();
+                    context.moveTo(x, y);
+                    context.arc(x, y, 8, 0, Math.PI * 2, true);
+                    context.fill();
+                    context.restore();
+                }
+
+                joystickBody(relativeX + 90, relativeY - 10);
+                joystickHead(relativeX + 90, relativeY - 10);
+                buttonBottom(relativeX + 90, relativeY);
+            }
+            // button, joystick
+            joystick(x + (width / 2), y + (height / 2));
+        }
+
+        const drawClawCraneGameExitBox = (centerX, centerY) => {
+            const exitBoxBody = () => {
+                const width = 100;
+                const height = 100;
+                const x = centerX - (width / 2) - 80;
+                const y = centerY - (height / 2) + 165;
+                const radius = 5;
+                const type = 'fill';
+                
+                drawRoundedRectangle(x+3, y+3, width, height, radius, type, 'rgba(0, 0, 0, 0.1)', 1); // 출구 그림자
+                drawRoundedRectangle(x, y, width, height, radius, type, 'rgba(255, 255, 255, 0.7)', 1); // 출구 유리    
+            }
+            const exitBoxHandle = () => {
+                const width = 80;
+                const height = 6;
+                const x = centerX - (width / 2) - 80;
+                const y = centerY - (height / 2) + 130;
+                const radius = 2;
+                const type = 'fill';
+                drawRoundedRectangle(x, y, width, height, radius, type, '#121212', 1);
+            }
+            
+            exitBoxBody();
+            exitBoxHandle();
+        }
+
+        const drawClawCraneGameFoot = (centerX, centerY) => {
+            const width = 310;
+            const height = 25;
+            const x = centerX - (width / 2);
+            const y = centerY - (height / 2) + 250;
+            const radius = 2;
+            const type = 'fill';
+            drawRoundedRectangle(x+3, y+3, width, height, radius, type, '#121212', 0.5);
+            drawRoundedRectangle(x, y, width, height, radius, type, '#121212', 1);
         }
 
         /** @param {*} type (타입 : line(선), fill(채우기)) */
