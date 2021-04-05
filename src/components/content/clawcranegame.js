@@ -5,7 +5,10 @@ export default function ClawCraneGame() {
     const [context, setContext] = useState();
     const wrap = useRef();
     const canvas = useRef();
-    const ratio = 1;
+    const raf = useRef();
+    const rafStartTime = useRef();
+    const movieSlateAnimationSpeed = useRef(1);
+    const ratio = 1.2;
 
     useEffect(() => {
         const clearContext = () => {
@@ -80,6 +83,9 @@ export default function ClawCraneGame() {
             const x = centerX - (width / 2);
             const y = centerY - (height / 2) + 50;
 
+            // clear
+            if(canvas.current) context.clearRect(x, y, width, height);
+
             context.save();
             context.beginPath();
             context.moveTo(x, y);
@@ -92,18 +98,18 @@ export default function ClawCraneGame() {
             context.restore();
 
             const buttonBottom = (relativeX, relativeY) => {
-                const width = 20;
+                const width = 24;
                 const height = 8;
                 const x = relativeX - (width / 2);
                 const y = relativeY - (height / 2);
                 const radius = 2;
                 const type = 'fill';
 
-                drawRoundedRectangle(x+1, y+2, width, height, radius, type, '#121212', 0.5);
+                drawRoundedRectangle(x + 2, y, width, height, radius, type, '#121212', 0.3);
                 drawRoundedRectangle(x, y, width, height, radius, type, '#121212', 1);
             }
 
-            const joystick = (relativeX, relativeY) => {
+            const joystick = (relativeX, relativeY, degree) => {
                 const joystickBody = (relativeX, relativeY)=> {
                     const width = 4;
                     const height = 20;
@@ -111,28 +117,70 @@ export default function ClawCraneGame() {
                     const y = relativeY - (height / 2);
                     const radius = 2;
                     const type = 'fill';
-                    drawRoundedRectangle(x+1, y+1, width, height, radius, type, '#121212', 0.5);
+
+                    drawRoundedRectangle(x+1, y+1, width, height, radius, type, '#121212', 0.3);
                     drawRoundedRectangle(x, y, width, height, radius, type, '#EEEEEE', 1);
                 }
                 const joystickHead = (relativeX, relativeY) => {
-                    const radius = 8;
+                    const radius = 10;
                     const x = relativeX;
                     const y = relativeY - radius * 2;
+
+                    context.save();
+                    context.beginPath();
+                    context.arc(x+2, y+2, radius, 0, Math.PI * 2, true);
+                    context.fillStyle = 'rgba(0, 0, 0, 0.3)';
+                    context.fill();
+                    context.restore();
                     
                     context.save();
                     context.beginPath();
-                    context.moveTo(x, y);
-                    context.arc(x, y, 8, 0, Math.PI * 2, true);
+                    context.arc(x, y, radius, 0, Math.PI * 2, true);
+                    context.fillStyle = '#DC143C';
+                    context.fill();
+                    context.restore();
+
+                    context.save();
+                    context.beginPath();
+                    context.arc(x + 2, y + 2, radius, Math.PI * -0.5, Math.PI * -1, true);
+                    context.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                    context.fill();
+                    context.restore();
+
+                    context.save();
+                    context.beginPath();
+                    context.arc(x + 2, y + 2, radius - 3, Math.PI * -0.5, Math.PI * -2.5, true);
+                    context.fillStyle = 'rgba(255, 0, 0, 0.8)';
                     context.fill();
                     context.restore();
                 }
 
-                joystickBody(relativeX + 90, relativeY - 10);
-                joystickHead(relativeX + 90, relativeY - 10);
+                context.save();
+                context.translate(relativeX + 90, relativeY - 10);
+                context.rotate(degree * Math.PI / 180);
+                context.translate(-relativeX - 90, -relativeY + 10);
+                joystickBody(relativeX + 90 + (degree / 5), relativeY - 10);
+                joystickHead(relativeX + 90 + (degree / 5), relativeY - 10);
+                context.restore();
                 buttonBottom(relativeX + 90, relativeY);
             }
-            // button, joystick
-            joystick(x + (width / 2), y + (height / 2));
+
+            const buttonDown = (relativeX, relativeY, downY) => {
+                const width = 20;
+                const height = 8;
+                const x = relativeX - (width / 2) + 60;
+                const y = relativeY - (height / 2) - 5 + downY;
+                const radius = 3;
+                const type = 'fill';
+                drawRoundedRectangle(x + 2, y, width, height, radius, type, '#121212', 0.3);
+                drawRoundedRectangle(x, y, width, height, radius, type, '#FF0000', 1);
+                buttonBottom(relativeX + 60, relativeY);
+            }
+
+            // 누를때 액션 개발 (0~3까지 다운)
+            buttonDown(x + (width / 2) - 10, y + (height / 2), 0);
+            // degree - -15 ~ 15도 사이 값(애니메이션)
+            joystick(x + (width / 2), y + (height / 2), 15);
         }
 
         const drawClawCraneGameExitBox = (centerX, centerY) => {
@@ -168,7 +216,7 @@ export default function ClawCraneGame() {
             const y = centerY - (height / 2) + 250;
             const radius = 2;
             const type = 'fill';
-            drawRoundedRectangle(x+3, y+3, width, height, radius, type, '#121212', 0.5);
+            drawRoundedRectangle(x+2, y-2, width, height, radius, type, '#121212', 0.5);
             drawRoundedRectangle(x, y, width, height, radius, type, '#121212', 1);
         }
 
@@ -196,6 +244,31 @@ export default function ClawCraneGame() {
             context.restore();
         }
 
+        const animateJoyStick = time => {
+            if(typeof rafStartTime.current === "undefined") rafStartTime.current = time;
+            const progress = time - rafStartTime.current;
+            // 애니메이션 동작 적용
+            const centerX = context.canvas.width / 2;
+            const centerY = context.canvas.height / 2;
+            drawClawCraneGameControlBox(centerX, centerY);
+        }
+
+        const animateButton = time => {
+            if(typeof rafStartTime.current === "undefined") rafStartTime.current = time;
+            const progress = time - rafStartTime.current;
+            // 애니메이션 동작 적용
+        }
+
+        const startAnimation = (animate) => {
+            raf.current = requestAnimationFrame(animate);
+        }
+
+        const cancelAnimation = () => {
+            cancelAnimationFrame(raf.current);
+            raf.current = undefined;
+            rafStartTime.current = undefined;
+        }
+
         const initCanvas = () => {
             context.canvas.width = canvas.current.clientWidth * ratio;
             context.canvas.height = canvas.current.clientHeight * ratio;
@@ -203,6 +276,15 @@ export default function ClawCraneGame() {
             drawContext();
             context.imageSmoothingEnabled = true;
             context.translate(0.5, 0.5);
+        }
+
+        const handleKeydown = (event) => {
+            if(event.keyCode === 39) { // Right
+                cancelAnimation();
+                startAnimation(animateJoyStick);
+            } else if(event.keyCode === 37) { // Left
+
+            }
         }
         
         // 초기 호출 함수
@@ -212,14 +294,17 @@ export default function ClawCraneGame() {
             }
             if(context) {
                 clearContext();
-                initCanvas(20);
+                initCanvas();
                 window.addEventListener('resize', initCanvas);
+                window.addEventListener('keydown', handleKeydown);
             }
         }
 
         return() => {
             window.removeEventListener('resize', initCanvas);
+            window.removeEventListener('keydown', handleKeydown);
             if(canvas && context) {
+                cancelAnimation();
                 clearContext();
             }
         }
