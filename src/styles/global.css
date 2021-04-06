@@ -1,11 +1,23 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+/* @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap'); */
 
 body {
     margin: 0;
     font-family: 'Roboto', sans-serif;
 }
 
+* {
+    outline: none;
+}
+
 a {
    text-decoration: none;
    color: #FFFFFF;
+}
+
+.material-icons {
+    font-family: 'Material Icons';
+    font-size: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

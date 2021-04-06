@@ -7,26 +7,38 @@ export default function ClawCraneGame() {
     const canvas = useRef();
     const raf = useRef();
     const rafStartTime = useRef();
-    const movieSlateAnimationSpeed = useRef(1);
+    const joystickAnimationSpeed = useRef(1);
+    const joystickDirection = useRef();
+    const downbuttonAnimationSpeed = useRef(1);
+    const downbuttonDirection = useRef();
+    const centerX = useRef(0);
+    const centerY = useRef(0);
+    const buttonLeft = useRef();
+    const buttonDown = useRef();
+    const buttonRight = useRef();
     const ratio = 1.2;
 
     useEffect(() => {
-        const clearContext = () => {
-            if(canvas.current) context.clearRect(0, 0, canvas.current.width, canvas.current.height);
+        const clearContext = (paramX, paramY, paramWidth, paramHeight) => {
+            if(canvas.current) {
+                const x = paramX ? paramX : 0;
+                const y = paramY ? paramY : 0;
+                const width = paramWidth ? paramWidth : canvas.current.width;
+                const height = paramHeight ? paramHeight : canvas.current.height;
+                context.clearRect(x, y, width, height);
+            }
         }
 
         const drawContext = () => {
             context.strokeStyle = '#FFFFFF';
             context.fillStyle = '#FFFFFF';
-            const centerX = context.canvas.width / 2;
-            const centerY = context.canvas.height / 2;
 
             context.save();
-            drawClawCraneGameBody(centerX, centerY);
+            drawClawCraneGameBody(centerX.current, centerY.current);
             context.globalCompositeOperation = 'source-atop';
-            drawClawCraneGameHead(centerX, centerY);
+            drawClawCraneGameHead(centerX.current, centerY.current);
             context.restore();
-            drawClawCraneGameFoot(centerX, centerY);
+            drawClawCraneGameFoot(centerX.current, centerY.current);
         }
 
         const drawClawCraneGameHead = (centerX, centerY) => {
@@ -59,7 +71,7 @@ export default function ClawCraneGame() {
             drawRoundedRectangle(x, y, width, height, radius, type, '#009688', 1);
 
             drawClawCraneGameGlass(centerX, centerY);
-            drawClawCraneGameControlBox(centerX, centerY);
+            drawClawCraneGameControlBox(centerX, centerY, 0, 0);
             drawClawCraneGameExitBox(centerX, centerY);
         }
 
@@ -74,17 +86,14 @@ export default function ClawCraneGame() {
             drawRoundedRectangle(x, y, width, height, radius, type, 'rgba(255, 255, 255, 0.7)', 1); // 유리 뒷면
             // TODO 인형 및 기타
             drawRoundedRectangle(x, y, width, height, radius, type, 'rgba(255, 255, 255, 0.1)', 1); // 유리 앞면
-            drawRoundedRectangle(x, y + height - 29, width, 30, radius, type, '#008080', 1); // 유리 하단(유리 거치대)
+            drawRoundedRectangle(x - 1, y + height - 10, width + 2, 30, radius, type, '#008080', 1); // 유리 하단(유리 거치대)
         }
 
-        const drawClawCraneGameControlBox = (centerX, centerY) => {
+        const drawClawCraneGameControlBox = (centerX, centerY, joystickDegree, downbuttonY) => {
             const width = 240;
             const height = 60;
             const x = centerX - (width / 2);
             const y = centerY - (height / 2) + 50;
-
-            // clear
-            if(canvas.current) context.clearRect(x, y, width, height);
 
             context.save();
             context.beginPath();
@@ -128,7 +137,7 @@ export default function ClawCraneGame() {
 
                     context.save();
                     context.beginPath();
-                    context.arc(x+2, y+2, radius, 0, Math.PI * 2, true);
+                    context.arc(x + 2, y + 2, radius, 0, Math.PI * 2, true);
                     context.fillStyle = 'rgba(0, 0, 0, 0.3)';
                     context.fill();
                     context.restore();
@@ -177,10 +186,8 @@ export default function ClawCraneGame() {
                 buttonBottom(relativeX + 60, relativeY);
             }
 
-            // 누를때 액션 개발 (0~3까지 다운)
-            buttonDown(x + (width / 2) - 10, y + (height / 2), 0);
-            // degree - -15 ~ 15도 사이 값(애니메이션)
-            joystick(x + (width / 2), y + (height / 2), 15);
+            buttonDown(x + (width / 2) - 10, y + (height / 2) + 15, downbuttonY);
+            joystick(x + (width / 2), y + (height / 2) + 15, joystickDegree);
         }
 
         const drawClawCraneGameExitBox = (centerX, centerY) => {
@@ -192,7 +199,7 @@ export default function ClawCraneGame() {
                 const radius = 5;
                 const type = 'fill';
                 
-                drawRoundedRectangle(x+3, y+3, width, height, radius, type, 'rgba(0, 0, 0, 0.1)', 1); // 출구 그림자
+                drawRoundedRectangle(x + 3, y + 3, width, height, radius, type, 'rgba(0, 0, 0, 0.1)', 1); // 출구 그림자
                 drawRoundedRectangle(x, y, width, height, radius, type, 'rgba(255, 255, 255, 0.7)', 1); // 출구 유리    
             }
             const exitBoxHandle = () => {
@@ -244,19 +251,35 @@ export default function ClawCraneGame() {
             context.restore();
         }
 
-        const animateJoyStick = time => {
+        const animateJoystick = time => {
             if(typeof rafStartTime.current === "undefined") rafStartTime.current = time;
             const progress = time - rafStartTime.current;
-            // 애니메이션 동작 적용
-            const centerX = context.canvas.width / 2;
-            const centerY = context.canvas.height / 2;
-            drawClawCraneGameControlBox(centerX, centerY);
+            const maxDegree = 15;
+            let calculate = 0;
+            if(joystickDirection.current === 'right') {
+                calculate = Math.min(((progress + (joystickAnimationSpeed.current++)*5) / maxDegree), maxDegree);
+            } else if(joystickDirection.current === 'left') {
+                calculate = -1 * Math.min(((progress + (joystickAnimationSpeed.current++)*5) / maxDegree), maxDegree);
+            }
+
+            drawClawCraneGameControlBox(centerX.current, centerY.current, calculate, 0);
+            if(calculate === maxDegree || calculate === (-1 * maxDegree)) {
+            } else {
+                startAnimation(animateJoystick);
+            }
         }
 
-        const animateButton = time => {
+        const animateDownbutton = time => {
             if(typeof rafStartTime.current === "undefined") rafStartTime.current = time;
             const progress = time - rafStartTime.current;
-            // 애니메이션 동작 적용
+            const maxY = 3;
+            const calculate = Math.min(((progress * 0.1) / maxY), maxY);
+
+            drawClawCraneGameControlBox(centerX.current, centerY.current, 0, calculate);
+            if(calculate === maxY) {
+            } else {
+                startAnimation(animateDownbutton);
+            }
         }
 
         const startAnimation = (animate) => {
@@ -272,18 +295,70 @@ export default function ClawCraneGame() {
         const initCanvas = () => {
             context.canvas.width = canvas.current.clientWidth * ratio;
             context.canvas.height = canvas.current.clientHeight * ratio;
+            centerX.current = context.canvas.width / 2;
+            centerY.current = context.canvas.height / 2;
             clearContext();
             drawContext();
             context.imageSmoothingEnabled = true;
-            context.translate(0.5, 0.5);
         }
 
         const handleKeydown = (event) => {
-            if(event.keyCode === 39) { // Right
+            const playAnimationJoystick = (direction) => {
+                joystickDirection.current = direction;
                 cancelAnimation();
-                startAnimation(animateJoyStick);
-            } else if(event.keyCode === 37) { // Left
+                startAnimation(animateJoystick);
+            }
+            const playAnimationDownbutton = (direction) => {
+                downbuttonDirection.current = direction
+                cancelAnimation();
+                startAnimation(animateDownbutton);
+            }
+            if(joystickDirection.current === undefined) {
+                if(event.keyCode === 39) { // Right
+                    playAnimationJoystick('right');
+                    buttonRight.current.classList.add(style.clawcranegame__keyItemActive);
+                } else if(event.keyCode === 37) { // Left
+                    playAnimationJoystick('left');
+                    buttonLeft.current.classList.add(style.clawcranegame__keyItemActive);
+                }
+            }
+            if(downbuttonDirection.current === undefined) {
+                if(event.keyCode === 40) { // Down
+                    playAnimationDownbutton('down');
+                    buttonDown.current.classList.add(style.clawcranegame__keyItemActive);
+                }
+            }
+        }
 
+        const handleKeyUp = (event) => {
+            const stopAnimationJoystick = () => {
+                joystickDirection.current = undefined;
+                joystickAnimationSpeed.current = 1;
+                cancelAnimation();
+                drawClawCraneGameControlBox(centerX.current, centerY.current, 0, 0);
+            }
+            const stopAnimationDownbutton = () => {
+                downbuttonDirection.current = undefined;
+                downbuttonAnimationSpeed.current = 1;
+                cancelAnimation();
+                drawClawCraneGameControlBox(centerX.current, centerY.current, 0, 0);
+            }
+            if(event.keyCode === 39) { // Right
+                stopAnimationJoystick();
+                if(buttonRight.current.classList.contains(style.clawcranegame__keyItemActive)) {
+                    buttonRight.current.classList.remove(style.clawcranegame__keyItemActive);
+                }
+            } else if(event.keyCode === 37) { // Left
+                stopAnimationJoystick();
+                if(buttonLeft.current.classList.contains(style.clawcranegame__keyItemActive)) {
+                    buttonLeft.current.classList.remove(style.clawcranegame__keyItemActive);
+                }
+            }
+            if(event.keyCode === 40) { // Down
+                stopAnimationDownbutton();
+                if(buttonDown.current.classList.contains(style.clawcranegame__keyItemActive)) {
+                    buttonDown.current.classList.remove(style.clawcranegame__keyItemActive);
+                }
             }
         }
         
@@ -297,12 +372,20 @@ export default function ClawCraneGame() {
                 initCanvas();
                 window.addEventListener('resize', initCanvas);
                 window.addEventListener('keydown', handleKeydown);
+                window.addEventListener('keyup', handleKeyUp);
+                window.addEventListener("contextmenu", e => e.preventDefault());
+                window.addEventListener("dragstart", e => e.preventDefault());
+                window.addEventListener("selectstart", e => e.preventDefault());
             }
         }
 
         return() => {
             window.removeEventListener('resize', initCanvas);
             window.removeEventListener('keydown', handleKeydown);
+            window.removeEventListener('keyup', handleKeyUp);
+            window.removeEventListener("contextmenu", e => e.preventDefault());
+            window.removeEventListener("dragstart", e => e.preventDefault());
+            window.removeEventListener("selectstart", e => e.preventDefault());
             if(canvas && context) {
                 cancelAnimation();
                 clearContext();
@@ -310,14 +393,74 @@ export default function ClawCraneGame() {
         }
     }, [context])
 
+    const handleTouchStartLeft = (event) => {
+        window.dispatchEvent(new KeyboardEvent('keydown', {key: 'ArrowLeft', keyCode: 37}));
+    }
+
+    const handleTouchEndLeft = (event) => {
+        window.dispatchEvent(new KeyboardEvent('keyup', {key: 'ArrowLeft', keyCode: 37}));
+    }
+
+    const handleTouchStartRight = (event) => {
+        window.dispatchEvent(new KeyboardEvent('keydown', {key: 'ArrowRight', keyCode: 39}));
+    }
+
+    const handleTouchEndRight = (event) => {
+        window.dispatchEvent(new KeyboardEvent('keyup', {key: 'ArrowRight', keyCode: 39}));
+    }
+
+    const handleTouchStartDown = (event) => {
+        window.dispatchEvent(new KeyboardEvent('keydown', {key: 'ArrowDown', keyCode: 40}));
+    }
+
+    const handleTouchEndDown = (event) => {
+        window.dispatchEvent(new KeyboardEvent('keyup', {key: 'ArrowDown', keyCode: 40}));
+    }
+
     return (
         <div
             ref={wrap}
             className={style.clawcranegame__canvasWrap}>
             <canvas
                 ref={canvas}
-                className={style.clawcranegame__canvasFull}>    
+                className={style.clawcranegame__canvasFull}>
             </canvas>
+            <div
+                className={style.clawcranegame__keyWrap}>
+                <button
+                    ref={buttonLeft} 
+                    className={style.clawcranegame__keyItem}
+                    onMouseDown={handleTouchStartLeft}
+                    onMouseUp={handleTouchEndLeft}
+                    onTouchStart={handleTouchStartLeft}
+                    onTouchEnd={handleTouchEndLeft}>
+                    <span className="material-icons">
+                        arrow_left
+                    </span>
+                </button>
+                <button 
+                    ref={buttonDown}
+                    className={style.clawcranegame__keyItem}
+                    onMouseDown={handleTouchStartDown}
+                    onMouseUp={handleTouchEndDown}
+                    onTouchStart={handleTouchStartDown}
+                    onTouchEnd={handleTouchEndDown}>
+                    <span className="material-icons">
+                        arrow_drop_down
+                    </span>
+                </button>
+                <button 
+                    ref={buttonRight}
+                    className={style.clawcranegame__keyItem}
+                    onMouseDown={handleTouchStartRight}
+                    onMouseUp={handleTouchEndRight}
+                    onTouchStart={handleTouchStartRight}
+                    onTouchEnd={handleTouchEndRight}>
+                    <span className="material-icons">
+                        arrow_right
+                    </span>
+                </button>
+            </div>
         </div>
     )
 }

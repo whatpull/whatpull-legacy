@@ -2,13 +2,13 @@ import React from "react"
 import { TransitionState } from "gatsby-plugin-transition-link"
 import * as style from "./default.module.css"
 import Header from "../common/header"
-import SEO from "../common/seo"
+import Seo from "../common/seo"
 import Splash from "../common/splash"
 
 export default function DefaultLayout({ children, background }) {
     return (
         <div className={style.layout__defaultWrap}>
-            <SEO />
+            <Seo />
             <div className={style.layout__defaultHead}>
                 <Header />
             </div>

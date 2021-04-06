@@ -14,8 +14,14 @@ export default function Header() {
     const patternImage = useRef();
 
     useEffect(() => {
-        const clearContext = () => {
-            if(canvas.current) context.clearRect(0, 0, canvas.current.width, canvas.current.height);
+        const clearContext = (paramX, paramY, paramWidth, paramHeight) => {
+            if(canvas.current) {
+                const x = paramX ? paramX : 0;
+                const y = paramY ? paramY : 0;
+                const width = paramWidth ? paramWidth : canvas.current.width;
+                const height = paramHeight ? paramHeight : canvas.current.height;
+                context.clearRect(x, y, width, height);
+            }
         }
     
         const drawContext = (x, y) => {

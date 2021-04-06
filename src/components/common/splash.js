@@ -11,6 +11,8 @@ export default function Splash({ mount }) {
     const raf = useRef();
     const rafStartTime = useRef();
     const movieSlateAnimationSpeed = useRef(1);
+    const centerX = useRef(0);
+    const centerY = useRef(0);
     const ratio = 1.3;
     const maxDegree = 20;
 
@@ -18,24 +20,29 @@ export default function Splash({ mount }) {
         const initCanvas = (progress) => {
             context.canvas.width = canvas.current.clientWidth * ratio;
             context.canvas.height = canvas.current.clientHeight * ratio;
+            centerX.current = context.canvas.width / 2;
+            centerY.current = context.canvas.height / 2;
             clearContext();
             drawContext(progress);
             context.imageSmoothingEnabled = true;
-            context.translate(0.5, 0.5);
         }
 
-        const clearContext = () => {
-            if(canvas.current) context.clearRect(0, 0, canvas.current.width, canvas.current.height);
+        const clearContext = (paramX, paramY, paramWidth, paramHeight) => {
+            if(canvas.current) {
+                const x = paramX ? paramX : 0;
+                const y = paramY ? paramY : 0;
+                const width = paramWidth ? paramWidth : canvas.current.width;
+                const height = paramHeight ? paramHeight : canvas.current.height;
+                context.clearRect(x, y, width, height);
+            }
         }
 
         const drawContext = (progress) => {
             context.strokeStyle = '#FFFFFF';
             context.fillStyle = '#FFFFFF';
-            const centerX = context.canvas.width / 2;
-            const centerY = context.canvas.height / 2;
-            drawMovieSlateBody(centerX, centerY);
-            drawMovieSlateHead(centerX, centerY, progress);
-            drawMovieSlateHeadConnector(centerX, centerY);
+            drawMovieSlateBody(centerX.current, centerY.current);
+            drawMovieSlateHead(centerX.current, centerY.current, progress);
+            drawMovieSlateHeadConnector(centerX.current, centerY.current);
         }
 
         const drawMovieSlateBody = (centerX, centerY) => {
@@ -153,10 +160,9 @@ export default function Splash({ mount }) {
         const animate = time => {
             if(typeof rafStartTime.current === "undefined") rafStartTime.current = time;
             const progress = time - rafStartTime.current;
-            const degree = maxDegree;
-            const calculate = Math.min(((progress + (movieSlateAnimationSpeed.current++)*5) / degree), degree);
+            const calculate = Math.min(((progress + (movieSlateAnimationSpeed.current++)*5) / maxDegree), maxDegree);
             initCanvas(calculate);
-            if(calculate === degree) { // 초기화
+            if(calculate === maxDegree) { // 초기화
                 cancelAnimation();
                 movieSlateAnimationSpeed.current = 1;
             } else {
@@ -219,7 +225,9 @@ export default function Splash({ mount }) {
                 ref={canvas}
                 className={style.splash__canvasFull}>
             </canvas>
-            <svg ref={svg}></svg>
+            <svg 
+                ref={svg}
+                style={{display: 'none'}}></svg>
         </div>
     )
 }

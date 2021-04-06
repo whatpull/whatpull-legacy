@@ -8,5 +8,39 @@
 .clawcranegame__canvas--full {
     width: 100%;
     height: calc(100% - 10px);
-    min-height: 520px;
+}
+
+.clawcranegame__key--wrap {
+    z-index: 1;
+    position: absolute;
+    bottom: 0;
+    right: calc(50% - 155px);
+    padding: 0 30px 50px 30px;
+}
+
+.clawcranegame__key--item {
+    z-index: 1;
+    position: relative;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    margin-right: 20px;
+    border: none;
+    background-color: #009688;
+    color: #FFEB3B;
+    cursor: pointer;
+    box-shadow: 1px 1px 0 1px rgba(0, 0, 0, 0.5);
+}
+
+.clawcranegame__key--item span{
+    text-shadow: 1px 1px rgba(0, 0, 0, 0.5);
+}
+
+.clawcranegame__key--item:last-child {
+    margin-right: 0;
+}
+
+.clawcranegame__key--item-active {
+    background-color: #FF0000;
+    color: #FFFFFF;
 }

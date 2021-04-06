@@ -46,5 +46,14 @@ module.exports = {
       __key: "pages",
     },
     `gatsby-plugin-transition-link`,
+    {
+      resolve: 'gatsby-plugin-google-fonts',
+      options: {
+        fonts: [
+          'material icons',
+          'roboto:300,400,500,700',
+        ],
+      },
+    },
   ],
 };
