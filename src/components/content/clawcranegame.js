@@ -16,7 +16,7 @@ export default function ClawCraneGame() {
     const buttonLeft = useRef();
     const buttonDown = useRef();
     const buttonRight = useRef();
-    const ratio = 1.2;
+    const ratio = 1.3;
 
     useEffect(() => {
         const clearContext = (paramX, paramY, paramWidth, paramHeight) => {
@@ -85,9 +85,15 @@ export default function ClawCraneGame() {
 
             drawRoundedRectangle(x, y, width, height, radius, type, 'rgba(255, 255, 255, 0.7)', 1); // 유리 뒷면
             // TODO 인형 및 기타
+            
             drawRoundedRectangle(x, y, width, height, radius, type, 'rgba(255, 255, 255, 0.1)', 1); // 유리 앞면
             drawRoundedRectangle(x - 1, y + height - 10, width + 2, 30, radius, type, '#008080', 1); // 유리 하단(유리 거치대)
         }
+
+        // TODO 크레인 개발
+        // const drawClawCraneGameGlassCrane = (centerX, centerY) => {
+
+        // }
 
         const drawClawCraneGameControlBox = (centerX, centerY, joystickDegree, downbuttonY) => {
             const width = 240;
@@ -114,7 +120,7 @@ export default function ClawCraneGame() {
                 const radius = 2;
                 const type = 'fill';
 
-                drawRoundedRectangle(x + 2, y, width, height, radius, type, '#121212', 0.3);
+                drawRoundedRectangle(x + 1, y, width, height, radius, type, '#121212', 0.3);
                 drawRoundedRectangle(x, y, width, height, radius, type, '#121212', 1);
             }
 
@@ -183,6 +189,21 @@ export default function ClawCraneGame() {
                 const type = 'fill';
                 drawRoundedRectangle(x + 2, y, width, height, radius, type, '#121212', 0.3);
                 drawRoundedRectangle(x, y, width, height, radius, type, '#FF0000', 1);
+
+                context.save();
+                context.beginPath();
+                context.arc(x + 5, y + 5, radius, Math.PI * -0.5, Math.PI * -1, true);
+                context.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                context.fill();
+                context.restore();
+
+                context.save();
+                context.beginPath();
+                context.arc(x + 5, y + 5, radius - 3, Math.PI * -0.5, Math.PI * -2.5, true);
+                context.fillStyle = 'rgba(255, 0, 0, 0.8)';
+                context.fill();
+                context.restore();
+
                 buttonBottom(relativeX + 60, relativeY);
             }
 
@@ -223,7 +244,7 @@ export default function ClawCraneGame() {
             const y = centerY - (height / 2) + 250;
             const radius = 2;
             const type = 'fill';
-            drawRoundedRectangle(x+2, y-2, width, height, radius, type, '#121212', 0.5);
+            drawRoundedRectangle(x+1, y-2, width-2, height, radius, type, '#121212', 0.5);
             drawRoundedRectangle(x, y, width, height, radius, type, '#121212', 1);
         }
 

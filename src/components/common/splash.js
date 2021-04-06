@@ -13,6 +13,7 @@ export default function Splash({ mount }) {
     const movieSlateAnimationSpeed = useRef(1);
     const centerX = useRef(0);
     const centerY = useRef(0);
+    const displayNone = useRef();
     const ratio = 1.3;
     const maxDegree = 20;
 
@@ -205,6 +206,16 @@ export default function Splash({ mount }) {
                     startAnimation();
                     window.addEventListener('resize', initCanvas);
                 });
+            }
+        }
+
+        // mount를 측정하여, 스플래쉬의 display를 none으로 적용한다.
+        // opacity만 0으로 변경될 경우 문제가 발생한다.
+        if(mount) {
+            if(typeof displayNone.current === 'undefined') {
+                displayNone.current = setTimeout(() => {
+                    wrap.current.style.display = 'none';
+                }, 2100);
             }
         }
 
