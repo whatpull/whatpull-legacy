@@ -83,17 +83,60 @@ export default function ClawCraneGame() {
             const radius = 0;
             const type = 'fill';
 
-            drawRoundedRectangle(x, y, width, height, radius, type, 'rgba(255, 255, 255, 0.7)', 1); // 유리 뒷면
-            // TODO 인형 및 기타
-            
-            drawRoundedRectangle(x, y, width, height, radius, type, 'rgba(255, 255, 255, 0.1)', 1); // 유리 앞면
+            drawRoundedRectangle(x, y, width, height, radius, type, 'rgba(255, 255, 255, 1)', 1); // 유리 뒷면
+            drawClawCraneGameGlassCrane(centerX, y);
+            drawRoundedRectangle(x, y, width, height, radius, type, 'rgba(246, 254, 255, 0.5)', 1); // 유리 앞면
             drawRoundedRectangle(x - 1, y + height - 10, width + 2, 30, radius, type, '#008080', 1); // 유리 하단(유리 거치대)
         }
 
-        // TODO 크레인 개발
-        // const drawClawCraneGameGlassCrane = (centerX, centerY) => {
+        const drawClawCraneGameGlassCrane = (centerX, centerY) => {
+            const radius = 20;
+            const x = centerX;
+            const y = centerY;
 
-        // }
+            context.save();
+            context.beginPath();
+            context.arc(x, y, radius + 3, Math.PI * 1, Math.PI * 2, true);
+            context.fillStyle = '#121212';
+            context.fill();
+            context.restore();
+
+            context.save();
+            context.beginPath();
+            drawRoundedRectangle(x - 5, y + 15, 10, 20, 2, 'fill', '#121212', 1);
+            drawRoundedRectangle(x - 3, y + 15, 6, 30, 2, 'fill', '#121212', 1); // 증가선
+            context.restore();
+
+            // 오른쪽 집게
+            context.save();
+            context.beginPath();
+            context.arc(x + 1, y + radius + 15 + 37, radius + 10, Math.PI * 0.5, Math.PI * 1.5, true);
+            context.fillStyle = '#121212';
+            context.fill();
+            context.restore();
+
+            context.save();
+            context.beginPath();
+            context.arc(x, y + radius + 15 + 37, radius + 5, Math.PI * 0.5, Math.PI * 1.5, true);
+            context.fillStyle = 'rgba(255, 255, 255, 1)';
+            context.fill();
+            context.restore();
+
+            // 왼쪽 집게
+            context.save();
+            context.beginPath();
+            context.arc(x - 1, y + radius + 15 + 37, radius + 10, Math.PI * 0.5, Math.PI * 1.5, false);
+            context.fillStyle = '#121212';
+            context.fill();
+            context.restore();
+
+            context.save();
+            context.beginPath();
+            context.arc(x, y + radius + 15 + 37, radius + 5, Math.PI * 0.5, Math.PI * 1.5, false);
+            context.fillStyle = 'rgba(255, 255, 255, 1)';
+            context.fill();
+            context.restore();
+        }
 
         const drawClawCraneGameControlBox = (centerX, centerY, joystickDegree, downbuttonY) => {
             const width = 240;
@@ -221,7 +264,7 @@ export default function ClawCraneGame() {
                 const type = 'fill';
                 
                 drawRoundedRectangle(x + 3, y + 3, width, height, radius, type, 'rgba(0, 0, 0, 0.1)', 1); // 출구 그림자
-                drawRoundedRectangle(x, y, width, height, radius, type, 'rgba(255, 255, 255, 0.7)', 1); // 출구 유리    
+                drawRoundedRectangle(x, y, width, height, radius, type, 'rgba(246, 254, 255, 0.7)', 1); // 출구 유리    
             }
             const exitBoxHandle = () => {
                 const width = 80;
