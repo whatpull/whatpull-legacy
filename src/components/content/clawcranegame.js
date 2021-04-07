@@ -9,16 +9,25 @@ export default function ClawCraneGame() {
     const rafStartTime = useRef();
     const joystickAnimationSpeed = useRef(1);
     const joystickDirection = useRef();
+    const joystickDegree = useRef(0);
     const downbuttonAnimationSpeed = useRef(1);
     const downbuttonDirection = useRef();
+    const craneDirection = useRef('down');
     const centerX = useRef(0);
     const centerY = useRef(0);
     const buttonLeft = useRef();
     const buttonDown = useRef();
     const buttonRight = useRef();
-    const ratio = 1.3;
+    const craneMoveX = useRef(0);
+    const craneMoveY = useRef(0);
 
     useEffect(() => {
+        const craneMinMoveX = -80;
+        const craneMaxMoveX = 80
+        const craneMinMoveY = 0;
+        const craneMaxMoveY = 130;
+        const ratio = 1.5;
+
         const clearContext = (paramX, paramY, paramWidth, paramHeight) => {
             if(canvas.current) {
                 const x = paramX ? paramX : 0;
@@ -33,11 +42,8 @@ export default function ClawCraneGame() {
             context.strokeStyle = '#FFFFFF';
             context.fillStyle = '#FFFFFF';
 
-            context.save();
             drawClawCraneGameBody(centerX.current, centerY.current);
-            context.globalCompositeOperation = 'source-atop';
             drawClawCraneGameHead(centerX.current, centerY.current);
-            context.restore();
             drawClawCraneGameFoot(centerX.current, centerY.current);
         }
 
@@ -45,7 +51,7 @@ export default function ClawCraneGame() {
             const width = 240;
             const height = 10;
             const x = centerX - (width / 2);
-            const y = centerY - (height / 2) - 220;
+            const y = centerY - (height / 2) - 225;
 
             context.save();
             context.beginPath();
@@ -84,29 +90,29 @@ export default function ClawCraneGame() {
             const type = 'fill';
 
             drawRoundedRectangle(x, y, width, height, radius, type, 'rgba(255, 255, 255, 1)', 1); // 유리 뒷면
-            drawClawCraneGameGlassCrane(centerX, y, 0); // -80 ~ 80 사이의 거리
+            drawClawCraneGameCrane(centerX, y); // -80 ~ 80 사이의 거리
             drawRoundedRectangle(x, y, width, height, radius, type, 'rgba(246, 254, 255, 0.5)', 1); // 유리 앞면
-            drawRoundedRectangle(x - 1, y + height - 10, width + 2, 30, radius, type, '#008080', 1); // 유리 하단(유리 거치대)
+            drawRoundedRectangle(x - 1, y + height - 10, width + 2, 10, radius, type, '#008080', 1); // 유리 하단(유리 거치대)
         }
 
-        const drawClawCraneGameGlassCrane = (centerX, centerY, moveX) => {
-            const x = centerX + moveX;
+        const drawClawCraneGameCrane = (centerX, centerY) => {
+            const x = centerX + craneMoveX.current;
             const y = centerY;
 
             const CraneBody = () => {
-                const radius = 20;
+                const radius = 10;
                 
                 context.save();
                 context.beginPath();
                 context.arc(x, y, radius + 3, Math.PI * 1, Math.PI * 2, true);
-                context.fillStyle = '#121212';
+                context.fillStyle = '#000000';
                 context.fill();
                 context.restore();
             }
 
             const CraneArm = (increaseHeight) => {
                 const calcX = x - 5;
-                const calcY = y + 15;
+                const calcY = y + 10;
                 const width = 10;
                 const height = 20;
                 const radius = 2;
@@ -121,6 +127,7 @@ export default function ClawCraneGame() {
 
             const CraneHand = (direction, increaseHeight, craneHandIsOpen) => {
                 const radius = 30;
+                const degree = 45;
                 const counterclockwise = direction === 'right' ? true : false;
                 const calcX = direction === 'right' ? x + 1 : x - 1;
                 const calcY = y + radius + 15 + 25 + increaseHeight;
@@ -145,14 +152,19 @@ export default function ClawCraneGame() {
                 context.restore();
             }
 
-            const increaseHeight = 50;
-            const craneHandIsOpen = true;
-            const degree = 45;
+            let craneHandIsOpen = false;
+            if(craneDirection.current === 'up' 
+                || craneDirection.current === 'left' 
+                || craneMoveY.current > craneMinMoveY) {
+                craneHandIsOpen = true;
+            } else {
+                craneHandIsOpen = false;
+            }
 
             CraneBody();
-            CraneArm(increaseHeight);
-            CraneHand('right', increaseHeight, craneHandIsOpen);
-            CraneHand('left', increaseHeight, craneHandIsOpen);
+            CraneArm(craneMoveY.current);
+            CraneHand('right', craneMoveY.current, craneHandIsOpen);
+            CraneHand('left', craneMoveY.current, craneHandIsOpen);
         }
 
         const drawClawCraneGameControlBox = (centerX, centerY, joystickDegree, downbuttonY) => {
@@ -335,32 +347,68 @@ export default function ClawCraneGame() {
         const animateJoystick = time => {
             if(typeof rafStartTime.current === "undefined") rafStartTime.current = time;
             const progress = time - rafStartTime.current;
-            const maxDegree = 15;
-            let calculate = 0;
-            if(joystickDirection.current === 'right') {
-                calculate = Math.min(((progress + (joystickAnimationSpeed.current++)*5) / maxDegree), maxDegree);
-            } else if(joystickDirection.current === 'left') {
-                calculate = -1 * Math.min(((progress + (joystickAnimationSpeed.current++)*5) / maxDegree), maxDegree);
-            }
 
-            drawClawCraneGameControlBox(centerX.current, centerY.current, calculate, 0);
-            if(calculate === maxDegree || calculate === (-1 * maxDegree)) {
-            } else {
-                startAnimation(animateJoystick);
+            const maxDegree = 15;
+            if(joystickDirection.current === 'right') {
+                joystickDegree.current = Math.min(joystickDegree.current + Math.round(progress * 0.1), maxDegree);
+            } else if(joystickDirection.current === 'left') {
+                joystickDegree.current = Math.max(joystickDegree.current - Math.round(progress * 0.1), -maxDegree);
             }
+            drawClawCraneGameControlBox(centerX.current, centerY.current, joystickDegree.current, 0);
+
+            if(joystickDirection.current === 'right') {
+                craneMoveX.current = Math.min(craneMoveX.current + Math.round(progress * 0.01), craneMaxMoveX);
+            } else if(joystickDirection.current === 'left') {
+                craneMoveX.current = Math.max(craneMoveX.current - Math.round(progress * 0.01), craneMinMoveX);
+            }
+            drawClawCraneGameGlass(centerX.current, centerY.current);
+
+            startAnimation(animateJoystick);
         }
 
         const animateDownbutton = time => {
             if(typeof rafStartTime.current === "undefined") rafStartTime.current = time;
             const progress = time - rafStartTime.current;
+
             const maxY = 3;
             const calculate = Math.min(((progress * 0.1) / maxY), maxY);
-
             drawClawCraneGameControlBox(centerX.current, centerY.current, 0, calculate);
+
             if(calculate === maxY) {
-            } else {
-                startAnimation(animateDownbutton);
+                cancelAnimationFrame(raf.current);
+                startAnimation(animateCrane);
             }
+            startAnimation(animateDownbutton);
+        }
+
+        const animateCrane = time => {
+            if(typeof rafStartTime.current === "undefined") rafStartTime.current = time;
+            const progress = time - rafStartTime.current;
+
+            if(craneDirection.current === 'down') {
+                craneMoveY.current = Math.min(craneMoveY.current + progress * 0.001, craneMaxMoveY);
+            } else if(craneDirection.current === 'up') {
+                craneMoveY.current = Math.max(craneMoveY.current - progress * 0.001, craneMinMoveY);
+            } else if(craneDirection.current === 'left') {
+                craneMoveX.current = Math.max(craneMoveX.current - Math.round(progress * 0.001), craneMinMoveX);
+            }
+            drawClawCraneGameGlass(centerX.current, centerY.current);
+
+            if(craneMoveY.current === craneMaxMoveY) {
+                craneDirection.current = 'up';
+            } else if(craneMoveY.current === craneMinMoveY) {
+                craneDirection.current = 'down';
+                if(craneMoveX.current === craneMinMoveX) {
+                    craneDirection.current = 'down';
+                    downbuttonDirection.current = undefined;
+                    downbuttonAnimationSpeed.current = 1;
+                    cancelAnimation();
+                    drawClawCraneGameControlBox(centerX.current, centerY.current, 0, 0);
+                } else {
+                    craneDirection.current = 'left';
+                }
+            }
+            startAnimation(animateCrane);
         }
 
         const startAnimation = (animate) => {
@@ -385,44 +433,41 @@ export default function ClawCraneGame() {
 
         const handleKeydown = (event) => {
             const playAnimationJoystick = (direction) => {
-                joystickDirection.current = direction;
-                cancelAnimation();
-                startAnimation(animateJoystick);
+                if(craneMoveY.current === 0 && craneDirection.current === 'down') { // 초기상태 체크
+                    cancelAnimationFrame(raf.current);
+                    joystickDirection.current = direction;
+                    startAnimation(animateJoystick);
+                }
             }
             const playAnimationDownbutton = (direction) => {
-                downbuttonDirection.current = direction
-                cancelAnimation();
-                startAnimation(animateDownbutton);
-            }
-            if(joystickDirection.current === undefined) {
-                if(event.keyCode === 39) { // Right
-                    playAnimationJoystick('right');
-                    buttonRight.current.classList.add(style.clawcranegame__keyItemActive);
-                } else if(event.keyCode === 37) { // Left
-                    playAnimationJoystick('left');
-                    buttonLeft.current.classList.add(style.clawcranegame__keyItemActive);
+                if(craneMoveY.current === 0 && craneDirection.current === 'down') { // 초기상태 체크
+                    cancelAnimationFrame(raf.current);
+                    downbuttonDirection.current = direction;
+                    startAnimation(animateDownbutton);
                 }
             }
-            if(downbuttonDirection.current === undefined) {
-                if(event.keyCode === 40) { // Down
-                    playAnimationDownbutton('down');
-                    buttonDown.current.classList.add(style.clawcranegame__keyItemActive);
-                }
+            if(event.keyCode === 39) { // Right
+                playAnimationJoystick('right');
+                buttonRight.current.classList.add(style.clawcranegame__keyItemActive);
+            } else if(event.keyCode === 37) { // Left
+                playAnimationJoystick('left');
+                buttonLeft.current.classList.add(style.clawcranegame__keyItemActive);
+            }
+            if(event.keyCode === 40) { // Down
+                playAnimationDownbutton('down');
+                buttonDown.current.classList.add(style.clawcranegame__keyItemActive);
             }
         }
 
         const handleKeyUp = (event) => {
             const stopAnimationJoystick = () => {
-                joystickDirection.current = undefined;
-                joystickAnimationSpeed.current = 1;
-                cancelAnimation();
-                drawClawCraneGameControlBox(centerX.current, centerY.current, 0, 0);
-            }
-            const stopAnimationDownbutton = () => {
-                downbuttonDirection.current = undefined;
-                downbuttonAnimationSpeed.current = 1;
-                cancelAnimation();
-                drawClawCraneGameControlBox(centerX.current, centerY.current, 0, 0);
+                if(craneMoveY.current === 0 && craneDirection.current === 'down') { // 초기상태 체크
+                    joystickDirection.current = undefined;
+                    joystickAnimationSpeed.current = 1;
+                    joystickDegree.current = 0;
+                    cancelAnimation();
+                    drawClawCraneGameControlBox(centerX.current, centerY.current, 0, 0);
+                }
             }
             if(event.keyCode === 39) { // Right
                 stopAnimationJoystick();
@@ -436,7 +481,6 @@ export default function ClawCraneGame() {
                 }
             }
             if(event.keyCode === 40) { // Down
-                stopAnimationDownbutton();
                 if(buttonDown.current.classList.contains(style.clawcranegame__keyItemActive)) {
                     buttonDown.current.classList.remove(style.clawcranegame__keyItemActive);
                 }
@@ -515,7 +559,9 @@ export default function ClawCraneGame() {
                     onMouseUp={handleTouchEndLeft}
                     onTouchStart={handleTouchStartLeft}
                     onTouchEnd={handleTouchEndLeft}>
-                    <span className="material-icons">
+                    <span 
+                        style={{fontSize: '60px'}} 
+                        className="material-icons">
                         arrow_left
                     </span>
                 </button>
@@ -526,7 +572,9 @@ export default function ClawCraneGame() {
                     onMouseUp={handleTouchEndDown}
                     onTouchStart={handleTouchStartDown}
                     onTouchEnd={handleTouchEndDown}>
-                    <span className="material-icons">
+                    <span
+                        style={{fontSize: '60px'}} 
+                        className="material-icons">
                         arrow_drop_down
                     </span>
                 </button>
@@ -537,7 +585,9 @@ export default function ClawCraneGame() {
                     onMouseUp={handleTouchEndRight}
                     onTouchStart={handleTouchStartRight}
                     onTouchEnd={handleTouchEndRight}>
-                    <span className="material-icons">
+                    <span 
+                        style={{fontSize: '60px'}}
+                        className="material-icons">
                         arrow_right
                     </span>
                 </button>
