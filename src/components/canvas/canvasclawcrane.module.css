@@ -1,0 +1,4 @@
+.clawcranegame__canvas--full {
+    width: 100%;
+    height: calc(100% - 10px);
+}
