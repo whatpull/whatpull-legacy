@@ -5,11 +5,6 @@
     overflow-y: auto;
 }
 
-.clawcranegame__canvas--full {
-    width: 100%;
-    height: calc(100% - 10px);
-}
-
 .clawcranegame__key--wrap {
     z-index: 1;
     position: absolute;

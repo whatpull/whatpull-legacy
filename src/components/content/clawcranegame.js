@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react'
 import * as style from './clawcranegame.module.css'
 import CanvasCrawCrane from '../canvas/canvasclawcrane'
+import CanvasDollLittlePrincess from '../canvas/canvasdolllittleprincess'
 
 export default function ClawCraneGame() {
     const buttonLeft = useRef();
@@ -78,6 +79,7 @@ export default function ClawCraneGame() {
     return (
         <div
             className={style.clawcranegame__canvasWrap}>
+            <CanvasDollLittlePrincess />
             <CanvasCrawCrane />
             <div
                 className={style.clawcranegame__keyWrap}>
