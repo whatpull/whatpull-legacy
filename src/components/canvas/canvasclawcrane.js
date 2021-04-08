@@ -85,10 +85,10 @@ export default function CanvasCrawCrane() {
             const radius = 0;
             const type = 'fill';
 
-            drawRoundedRectangle(x, y, width, height, radius, type, 'rgba(255, 255, 255, 1)', 1); // 유리 뒷면
+            drawRoundedRectangle(x, y, width, height, radius, type, '#ABCDED', 1); // 유리 뒷면
             drawClawCraneGameCrane(centerX, y); // -80 ~ 80 사이의 거리
-            drawRoundedRectangle(x, y, width, height, radius, type, 'rgba(246, 254, 255, 0.5)', 1); // 유리 앞면
-            drawRoundedRectangle(x - 1, y + height - 10, width + 2, 10, radius, type, '#008080', 1); // 유리 하단(유리 거치대)
+            // drawRoundedRectangle(x, y, width, height, radius, type, 'rgba(246, 254, 255, 0.5)', 1); // 유리 앞면
+            // drawRoundedRectangle(x - 1, y + height - 10, width + 2, 10, radius, type, '#008080', 1); // 유리 하단(유리 거치대)
         }
 
         const drawClawCraneGameCrane = (centerX, centerY) => {
@@ -142,7 +142,7 @@ export default function CanvasCrawCrane() {
     
                 context.beginPath();
                 context.arc(calcX + (direction === 'right' ? -1 : 1), calcY, radius - 5, Math.PI * 0.5, Math.PI * 1.5, counterclockwise);
-                context.fillStyle = 'rgba(255, 255, 255, 1)';
+                context.fillStyle = '#ABCDED';
                 context.fill();
 
                 context.restore();

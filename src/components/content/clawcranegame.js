@@ -4,6 +4,7 @@ import CanvasCrawCrane from '../canvas/canvasclawcrane'
 import CanvasDollLittlePrincess from '../canvas/canvasdolllittleprincess'
 
 export default function ClawCraneGame() {
+    const audioMain = useRef();
     const buttonLeft = useRef();
     const buttonDown = useRef();
     const buttonRight = useRef();
@@ -79,6 +80,13 @@ export default function ClawCraneGame() {
     return (
         <div
             className={style.clawcranegame__canvasWrap}>
+            <audio
+                ref={audioMain}
+                loop
+                style={{zIndex: 999}}>
+                <source src="/crawcranegame_main.ogg" type="audio/ogg" />
+                <source src="/crawcranegame_main.mp3" type="audio/mpeg" />
+            </audio>
             <CanvasDollLittlePrincess />
             <CanvasCrawCrane />
             <div
