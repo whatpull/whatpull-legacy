@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import * as style from './canvasclawcrane.module.css';
 
-export default function CanvasCrawCrane() {
+export default function CanvasCrawCrane({ handleSetAudioIsStop }) {
     const [context, setContext] = useState();
     const canvas = useRef();
     const raf = useRef();
@@ -400,6 +400,7 @@ export default function CanvasCrawCrane() {
                     downbuttonAnimationSpeed.current = 1;
                     cancelAnimation();
                     drawClawCraneGameControlBox(centerX.current, centerY.current, 0, 0);
+                    handleSetAudioIsStop(true);
                 } else {
                     craneDirection.current = 'left';
                 }

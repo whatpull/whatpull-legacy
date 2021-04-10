@@ -44,9 +44,9 @@ export default function ClawCraneGame() {
                 }
                 audioStop(audioMain.current);
                 audioPlay(audioCatch.current);
-                setTimeout(function() {
-                    audioStop(audioCatch.current);
-                }, 3500)
+                // setTimeout(function() {
+                //     audioStop(audioCatch.current);
+                // }, 3500)
             }
         }
 
@@ -86,6 +86,7 @@ export default function ClawCraneGame() {
         if(audioIsStop) {
             audioStop(audioMain.current);
             audioStop(audioCatch.current);
+            setAudioIsStop(false);
         }
         window.addEventListener('keydown', handleKeydown);
         window.addEventListener('keyup', handleKeyUp);
