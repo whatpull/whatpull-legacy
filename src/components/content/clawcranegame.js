@@ -4,7 +4,8 @@ import CanvasCrawCrane from '../canvas/canvasclawcrane'
 import CanvasDollLittlePrincess from '../canvas/canvasdolllittleprincess'
 
 export default function ClawCraneGame() {
-    const [audioIsStop, setAudioIsStop] = useState(false);
+    const [audioCatchIsPlay, setAudioCatchIsPlay] = useState(false);
+    const [audioCatchIsStop, setAudioCatchIsStop] = useState(false);
     const audioMain = useRef();
     const audioCatch = useRef();
     const audioContext = useRef();
@@ -24,7 +25,7 @@ export default function ClawCraneGame() {
             if(event.keyCode === 40) { // Down
                 buttonDown.current.classList.add(style.clawcranegame__keyItemActive);
                 audioStop(audioMain.current);
-                audioPlay(audioCatch.current);
+                // audioPlay(audioCatch.current);
             }
         }
 
@@ -50,7 +51,11 @@ export default function ClawCraneGame() {
                 audioContext.current.suspend().then(() => {
                     element.pause();
                     element.currentTime = 0;
-                    setAudioIsStop(false);
+                    console.log(element);
+                    if(element === audioCatch.current) {
+                        setAudioCatchIsPlay(false);
+                        setAudioCatchIsStop(false);
+                    }
                 });
             }
         }
@@ -70,7 +75,10 @@ export default function ClawCraneGame() {
                     const promise = element.play();
                     if (typeof promise === 'object') {
                         promise.then(_ => {
-                        // Autoplay started!
+                            if(element === audioCatch.current) {
+                                setAudioCatchIsPlay(false);
+                                setAudioCatchIsStop(false);
+                            }
                         }).catch(error => {
                             console.log(error);
                         });
@@ -79,9 +87,12 @@ export default function ClawCraneGame() {
             }
         }
         
-        if(audioIsStop) {
+        if(audioCatchIsStop) {
             audioStop(audioCatch.current);
         }
+        if(audioCatchIsPlay) {
+            audioPlay(audioCatch.current);
+        } 
         window.addEventListener('keydown', handleKeydown);
         window.addEventListener('keyup', handleKeyUp);
         window.addEventListener("contextmenu", e => e.preventDefault());
@@ -95,7 +106,7 @@ export default function ClawCraneGame() {
             window.removeEventListener("dragstart", e => e.preventDefault());
             window.removeEventListener("selectstart", e => e.preventDefault());
         }
-    }, [audioIsStop])
+    }, [audioCatchIsPlay, audioCatchIsStop])
 
     const handleTouchStartLeft = (event) => {
         window.dispatchEvent(new KeyboardEvent('keydown', {key: 'ArrowLeft', keyCode: 37}));
@@ -121,15 +132,21 @@ export default function ClawCraneGame() {
         window.dispatchEvent(new KeyboardEvent('keyup', {key: 'ArrowDown', keyCode: 40}));
     }
 
-    const handleSetAudioIsStop = (isStop) => {
-        setAudioIsStop(isStop);
+    const handleSetAudioCatchIsPlay = (isPlay) => {
+        setAudioCatchIsPlay(isPlay);
+    }
+
+    const handleSetAudioCatchIsStop = (isStop) => {
+        setAudioCatchIsStop(isStop);
     }
 
     return (
         <div
             className={style.clawcranegame__canvasWrap}>
             <CanvasDollLittlePrincess />
-            <CanvasCrawCrane handleSetAudioIsStop={handleSetAudioIsStop} />
+            <CanvasCrawCrane 
+                handleSetAudioCatchIsPlay={handleSetAudioCatchIsPlay}
+                handleSetAudioCatchIsStop={handleSetAudioCatchIsStop} />
             <div
                 className={style.clawcranegame__keyWrap}>
                 <button
@@ -177,12 +194,14 @@ export default function ClawCraneGame() {
                 loop>
                 <source src="/crawcranegame_main.ogg" type="audio/ogg" />
                 <source src="/crawcranegame_main.mp3" type="audio/mpeg" />
+                <track src="/common.vtt" kind="captions" srcLang="ko" label="Korea" />
             </audio>
             <audio
                 ref={audioCatch}
                 loop>
                 <source src="/crawcranegame_catch.ogg" type="audio/ogg" />
                 <source src="/crawcranegame_catch.mp3" type="audio/mpeg" />
+                <track src="/common.vtt" kind="captions" srcLang="ko" label="Korea" />
             </audio>
         </div>
     )
