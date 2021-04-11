@@ -16,11 +16,15 @@ export default function ClawCraneGame() {
         const handleKeydown = (event) => {
             if(event.keyCode === 39) { // Right
                 buttonRight.current.classList.add(style.clawcranegame__keyItemActive);
+                audioPlay(audioMain.current);
             } else if(event.keyCode === 37) { // Left
                 buttonLeft.current.classList.add(style.clawcranegame__keyItemActive);
+                audioPlay(audioMain.current);
             }
             if(event.keyCode === 40) { // Down
                 buttonDown.current.classList.add(style.clawcranegame__keyItemActive);
+                audioStop(audioMain.current);
+                audioPlay(audioCatch.current);
             }
         }
 
@@ -29,32 +33,24 @@ export default function ClawCraneGame() {
                 if(buttonRight.current.classList.contains(style.clawcranegame__keyItemActive)) {
                     buttonRight.current.classList.remove(style.clawcranegame__keyItemActive);
                 }
-                audioStop(audioCatch.current);
-                audioPlay(audioMain.current);
             } else if(event.keyCode === 37) { // Left
                 if(buttonLeft.current.classList.contains(style.clawcranegame__keyItemActive)) {
                     buttonLeft.current.classList.remove(style.clawcranegame__keyItemActive);
                 }
-                audioStop(audioCatch.current);
-                audioPlay(audioMain.current);
             }
             if(event.keyCode === 40) { // Down
                 if(buttonDown.current.classList.contains(style.clawcranegame__keyItemActive)) {
                     buttonDown.current.classList.remove(style.clawcranegame__keyItemActive);
                 }
-                audioStop(audioMain.current);
-                audioPlay(audioCatch.current);
-                // setTimeout(function() {
-                //     audioStop(audioCatch.current);
-                // }, 3500)
             }
         }
 
         const audioStop = (element) => {
-            if(audioContext.current) {
-                audioContext.current.resume().then(() => {
+            if(audioContext.current && audioContext.current.state === 'running') {
+                audioContext.current.suspend().then(() => {
                     element.pause();
                     element.currentTime = 0;
+                    setAudioIsStop(false);
                 });
             }
         }
@@ -68,7 +64,7 @@ export default function ClawCraneGame() {
                 source.connect(gain).connect(destination);
             }
 
-            if(audioContext.current) {
+            if(audioContext.current && audioContext.current.state === 'suspended') {
                 audioContext.current.resume().then(() => {
                     console.log('Playback resumed successfully');
                     const promise = element.play();
@@ -84,9 +80,7 @@ export default function ClawCraneGame() {
         }
         
         if(audioIsStop) {
-            audioStop(audioMain.current);
             audioStop(audioCatch.current);
-            setAudioIsStop(false);
         }
         window.addEventListener('keydown', handleKeydown);
         window.addEventListener('keyup', handleKeyUp);
