@@ -25,7 +25,6 @@ export default function ClawCraneGame() {
             if(event.keyCode === 40) { // Down
                 buttonDown.current.classList.add(style.clawcranegame__keyItemActive);
                 audioStop(audioMain.current);
-                // audioPlay(audioCatch.current);
             }
         }
 
@@ -67,6 +66,7 @@ export default function ClawCraneGame() {
                 const source = audioContext.current.createMediaElementSource(element);
                 const gain = audioContext.current.createGain();
                 source.connect(gain).connect(destination);
+                audioContext.current.suspend();
             }
 
             if(audioContext.current && audioContext.current.state === 'suspended') {
