@@ -1,17 +1,75 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useCallback } from 'react'
 import * as style from './clawcranegame.module.css'
 import CanvasCrawCrane from '../canvas/canvasclawcrane'
 import CanvasDollLittlePrincess from '../canvas/canvasdolllittleprincess'
 
 export default function ClawCraneGame() {
-    const [audioCatchIsPlay, setAudioCatchIsPlay] = useState(false);
-    const [audioCatchIsStop, setAudioCatchIsStop] = useState(false);
+    const [isCatch, setIsCatch] = useState(false);
+    const [craneDirection, setCraneDirection] = useState('down');
+    const [craneMoveX, setCraneMoveX] = useState(0);
+    const [craneMoveY, setCraneMoveY] = useState(0);
     const audioMain = useRef();
     const audioCatch = useRef();
     const audioContext = useRef();
     const buttonLeft = useRef();
     const buttonDown = useRef();
     const buttonRight = useRef();
+    const handleSetAudioCatchIsPlay = useCallback((isPlay) => {
+        if(isPlay) { 
+            setIsCatch(true);
+            audioPlay(audioCatch.current);
+        }
+    }, []);
+    const handleSetAudioCatchIsStop = useCallback((isStop) => {
+        if(isStop) { 
+            setIsCatch(false);
+            audioStop(audioCatch.current);
+        }
+    }, []);
+    const handleCrane = useCallback((craneDirection, craneMoveX, craneMoveY) => {
+        if(craneDirection === 'down') {
+            
+        } else {
+            setCraneDirection(craneDirection);
+            setCraneMoveX(craneMoveX);
+            setCraneMoveY(craneMoveY);
+        }
+    }, [])
+    const animationCrane = useCallback(() => { 
+        return {craneDirection: craneDirection, craneMoveX: craneMoveX, craneMoveY: craneMoveY}
+    }, [craneDirection, craneMoveX, craneMoveY])
+
+    const audioStop = (element) => {
+        if(audioContext.current && audioContext.current.state === 'running') {
+            audioContext.current.suspend().then(() => {
+                element.pause();
+                element.currentTime = 0;
+            });
+        }
+    }
+
+    const audioPlay = (element) => {
+        if(typeof audioContext.current === 'undefined') {
+            audioContext.current = new AudioContext()
+            const destination = audioContext.current.destination;
+            const source = audioContext.current.createMediaElementSource(element);
+            const gain = audioContext.current.createGain();
+            source.connect(gain).connect(destination);
+            audioContext.current.suspend();
+        }
+
+        if(audioContext.current && audioContext.current.state === 'suspended') {
+            audioContext.current.resume().then(() => {
+                const promise = element.play();
+                if (typeof promise === 'object') {
+                    promise.then(_ => {
+                    }).catch(error => {
+                        console.log(error);
+                    });
+                }
+            });
+        }
+    }
 
     useEffect(() => {
         const handleKeydown = (event) => {
@@ -44,55 +102,7 @@ export default function ClawCraneGame() {
                 }
             }
         }
-
-        const audioStop = (element) => {
-            if(audioContext.current && audioContext.current.state === 'running') {
-                audioContext.current.suspend().then(() => {
-                    element.pause();
-                    element.currentTime = 0;
-                    console.log(element);
-                    if(element === audioCatch.current) {
-                        setAudioCatchIsPlay(false);
-                        setAudioCatchIsStop(false);
-                    }
-                });
-            }
-        }
-
-        const audioPlay = (element) => {
-            if(typeof audioContext.current === 'undefined') {
-                audioContext.current = new AudioContext()
-                const destination = audioContext.current.destination;
-                const source = audioContext.current.createMediaElementSource(element);
-                const gain = audioContext.current.createGain();
-                source.connect(gain).connect(destination);
-                audioContext.current.suspend();
-            }
-
-            if(audioContext.current && audioContext.current.state === 'suspended') {
-                audioContext.current.resume().then(() => {
-                    console.log('Playback resumed successfully');
-                    const promise = element.play();
-                    if (typeof promise === 'object') {
-                        promise.then(_ => {
-                            if(element === audioCatch.current) {
-                                setAudioCatchIsPlay(false);
-                                setAudioCatchIsStop(false);
-                            }
-                        }).catch(error => {
-                            console.log(error);
-                        });
-                    }
-                });
-            }
-        }
         
-        if(audioCatchIsStop) {
-            audioStop(audioCatch.current);
-        }
-        if(audioCatchIsPlay) {
-            audioPlay(audioCatch.current);
-        } 
         window.addEventListener('keydown', handleKeydown);
         window.addEventListener('keyup', handleKeyUp);
         window.addEventListener("contextmenu", e => e.preventDefault());
@@ -106,7 +116,7 @@ export default function ClawCraneGame() {
             window.removeEventListener("dragstart", e => e.preventDefault());
             window.removeEventListener("selectstart", e => e.preventDefault());
         }
-    }, [audioCatchIsPlay, audioCatchIsStop])
+    }, [])
 
     const handleTouchStartLeft = (event) => {
         window.dispatchEvent(new KeyboardEvent('keydown', {key: 'ArrowLeft', keyCode: 37}));
@@ -132,21 +142,16 @@ export default function ClawCraneGame() {
         window.dispatchEvent(new KeyboardEvent('keyup', {key: 'ArrowDown', keyCode: 40}));
     }
 
-    const handleSetAudioCatchIsPlay = (isPlay) => {
-        setAudioCatchIsPlay(isPlay);
-    }
-
-    const handleSetAudioCatchIsStop = (isStop) => {
-        setAudioCatchIsStop(isStop);
-    }
-
     return (
         <div
             className={style.clawcranegame__canvasWrap}>
-            <CanvasDollLittlePrincess />
+            <CanvasDollLittlePrincess 
+                isCatch={isCatch}
+                animationCrane={animationCrane} />
             <CanvasCrawCrane 
                 handleSetAudioCatchIsPlay={handleSetAudioCatchIsPlay}
-                handleSetAudioCatchIsStop={handleSetAudioCatchIsStop} />
+                handleSetAudioCatchIsStop={handleSetAudioCatchIsStop}
+                handleCrane={handleCrane} />
             <div
                 className={style.clawcranegame__keyWrap}>
                 <button

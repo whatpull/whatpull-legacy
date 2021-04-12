@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import * as style from './canvasdolllittleprincess.module.css'
 
-export default function CanvasDollLittlePrincess() {
+export default function CanvasDollLittlePrincess({ isCatch, animationCrane }) {
     const [context, setContext] = useState();
     const canvas = useRef();
     const centerX = useRef(0);
     const centerY = useRef(0);
-    const ratio = 1.5;
 
     useEffect(() => {
+        const ratio = 1.5;
+
         const clearContext = (paramX, paramY, paramWidth, paramHeight) => {
             if(canvas.current) {
                 const x = paramX ? paramX : 0;
@@ -28,10 +29,14 @@ export default function CanvasDollLittlePrincess() {
             const neckHeight = 10;
             const bodyRadius = 10;
             const bodyHeight = 30;
-            drawDollHead(centerX.current, centerY.current - bodyRadius - bodyHeight, headRadius, hairRadius);
-            drawDollBody(centerX.current, centerY.current - bodyRadius - bodyHeight, headRadius, hairRadius, neckHeight, bodyRadius, bodyHeight);
-            drawDollNeck(centerX.current, centerY.current - bodyRadius - bodyHeight, headRadius, neckHeight);
-            drawClawCraneGameGlass(centerX.current, centerY.current);
+
+            const animate = animationCrane();
+            const x = centerX.current + animate.craneMoveX;
+            const y = centerY.current - bodyRadius - bodyHeight + (animate.craneMoveY - 100);
+            drawDollHead(x, y, headRadius, hairRadius);
+            drawDollBody(x, y, headRadius, hairRadius, neckHeight, bodyRadius, bodyHeight);
+            drawDollNeck(x, y, headRadius, neckHeight);
+            // drawClawCraneGameGlass(centerX.current, centerY.current);
         }
 
         const drawDollHead = (centerX, centerY, headRadius, hairRadius) => {
@@ -190,8 +195,23 @@ export default function CanvasDollLittlePrincess() {
                     context.restore();
                 }
 
+                const degree = 0; // 0 ~ 45
+
+                context.save();
+                context.beginPath();
+                context.translate(x, y);
+                context.rotate(degree * Math.PI / 180);
+                context.translate(-x - (degree / 20), -y + (degree / 10));
                 drawDollCoatArm('right');
+                context.restore();
+
+                context.save();
+                context.beginPath();
+                context.translate(x, y);
+                context.rotate(-degree * Math.PI / 180);
+                context.translate(-x + (degree / 20), -y + (degree / 10));
                 drawDollCoatArm('left');
+                context.restore();
             }
 
             const drawDollPants = () => {
@@ -204,14 +224,16 @@ export default function CanvasDollLittlePrincess() {
                 context.fillStyle = '#0A6EFF';
                 context.fill();
                 context.restore();
+
+                clearContext(x - 1, y + coat + 2, 2, pants);
             }
 
             const drawDollShoes = (direction) => {
                 const relativeX = direction === 'right' ? x - 5 : x + 5;
-                const relativey = y + coat + pants + 1;
+                const relativey = y + coat + pants + 2;
                 context.save();
                 context.beginPath();
-                context.arc(relativeX, relativey, 4, Math.PI * 1, Math.PI * 2, false);
+                context.arc(relativeX, relativey, 5, Math.PI * 1, Math.PI * 2, false);
                 context.fillStyle = '#4d3b33';
                 context.fill();
                 context.restore();
@@ -232,13 +254,13 @@ export default function CanvasDollLittlePrincess() {
             const type = 'fill';
 
             drawRoundedRectangle(x, y, width, height, radius, type, 'rgba(246, 254, 255, 0.5)', 1); // 유리 앞면
-            // drawRoundedRectangle(x - 1, y + height - 5, width + 2, 5, radius, type, '#008080', 1); // 유리 하단(유리 거치대)
+            drawRoundedRectangle(x - 1, y + height - 2, width + 2, 2, radius, type, '#008080', 1); // 유리 하단(유리 거치대)
         }
 
         /** @param {*} type (타입 : line(선), fill(채우기)) */
         const drawRoundedRectangle = (x, y, width, height, radius, type, color, alpha) => {
             context.save();
-            context.beginPath();
+            context.beginPath(); 
             context.moveTo(x + (radius * 2), y);
             context.arcTo(x + width, y, x + width, y + (radius * 2), radius); // top, right
             context.lineTo(x + width, y + (radius * 2));
@@ -283,8 +305,11 @@ export default function CanvasDollLittlePrincess() {
 
         return() => {
             window.removeEventListener('resize', initCanvas);
+            if(canvas && context) {
+                clearContext();
+            }
         }
-    }, [context])
+    }, [context, isCatch, animationCrane])
 
     return (
         <canvas

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import * as style from './canvasclawcrane.module.css';
 
-export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAudioCatchIsStop }) {
+export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAudioCatchIsStop, handleCrane }) {
     const [context, setContext] = useState();
     const canvas = useRef();
     const raf = useRef();
@@ -12,16 +12,16 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAu
     const downbuttonAnimationSpeed = useRef(1);
     const downbuttonDirection = useRef();
     const craneDirection = useRef('down');
-    const centerX = useRef(0);
-    const centerY = useRef(0);
     const craneMoveX = useRef(0);
     const craneMoveY = useRef(0);
+    const centerX = useRef(0);
+    const centerY = useRef(0);
 
     useEffect(() => {
         const craneMinMoveX = -80;
-        const craneMaxMoveX = 80
+        const craneMaxMoveX = 80;
         const craneMinMoveY = 0;
-        const craneMaxMoveY = 130;
+        const craneMaxMoveY = 100;
         const ratio = 1.5;
 
         const clearContext = (paramX, paramY, paramWidth, paramHeight) => {
@@ -387,14 +387,14 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAu
             } else if(craneDirection.current === 'up') {
                 craneMoveY.current = Math.max(craneMoveY.current - progress * 0.001, craneMinMoveY);
             } else if(craneDirection.current === 'left') {
-                craneMoveX.current = Math.max(craneMoveX.current - Math.round(progress * 0.001), craneMinMoveX);
+                craneMoveX.current = Math.max(craneMoveX.current - progress * 0.001, craneMinMoveX);
             }
             drawClawCraneGameGlass(centerX.current, centerY.current);
+            handleCrane(craneDirection.current, craneMoveX.current, craneMoveY.current);
 
             if(craneMoveY.current === craneMaxMoveY) {
                 craneDirection.current = 'up';
             } else if(craneMoveY.current === craneMinMoveY) {
-                craneDirection.current = 'down';
                 if(craneMoveX.current === craneMinMoveX) {
                     craneDirection.current = 'down';
                     downbuttonDirection.current = undefined;
@@ -500,7 +500,7 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAu
                 clearContext();
             }
         }
-    }, [context])
+    }, [context, handleSetAudioCatchIsPlay, handleSetAudioCatchIsStop, handleCrane])
     
     return (
         <canvas
