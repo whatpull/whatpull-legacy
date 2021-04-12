@@ -406,13 +406,13 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAu
             }
 
             if(craneDirection.current === 'stop') {
-                handleSetAudioCatchIsStop(true);
                 downbuttonDirection.current = undefined;
                 downbuttonAnimationSpeed.current = 1;
-                cancelAnimation();
                 drawClawCraneGameControlBox(centerX.current, centerY.current, 0, 0);
                 drawClawCraneGameGlass(centerX.current, centerY.current);
                 handleCrane(craneDirection.current, craneMoveX.current, craneMoveY.current);
+                cancelAnimation();
+                handleSetAudioCatchIsStop(true);
             } else {
                 startAnimation(animateCrane);
             }
