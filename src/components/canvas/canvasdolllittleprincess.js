@@ -29,8 +29,8 @@ export default function CanvasDollLittlePrincess() {
             const bodyRadius = 10;
             const bodyHeight = 30;
             drawDollHead(centerX.current, centerY.current - bodyRadius - bodyHeight, headRadius, hairRadius);
-            drawDollNeck(centerX.current, centerY.current - bodyRadius - bodyHeight, headRadius, neckHeight);
             drawDollBody(centerX.current, centerY.current - bodyRadius - bodyHeight, headRadius, hairRadius, neckHeight, bodyRadius, bodyHeight);
+            drawDollNeck(centerX.current, centerY.current - bodyRadius - bodyHeight, headRadius, neckHeight);
             drawClawCraneGameGlass(centerX.current, centerY.current);
         }
 
@@ -40,15 +40,31 @@ export default function CanvasDollLittlePrincess() {
             const y = centerY;
 
             drawDollBackHair(radius, x, y, hairRadius);
-            
+            drawDollFace(radius, x, y);
+            drawDollFrontHair(radius, x, y);
+        }
+
+        const drawDollFace = (faceRadius, faceX, faceY) => {
             context.save();
             context.beginPath();
-            context.arc(x, y, radius, 0, Math.PI * 2, true);
+            context.arc(faceX, faceY, faceRadius, 0, Math.PI * 2, true);
             context.fillStyle = '#FBCEB1';
             context.fill();
             context.restore();
 
-            drawDollFrontHair(radius, x, y);
+            const drawDollEye = (direction) => {
+                const x = direction === 'right' ? faceX - 7 : faceX + 7;
+                const y = faceY + 2;
+                context.save();
+                context.beginPath();
+                context.arc(x, y, 3, 0, Math.PI * 2, true);
+                context.fillStyle = '#121212';
+                context.fill();
+                context.restore();
+            }
+
+            drawDollEye('right');
+            drawDollEye('left');
         }
 
         const drawDollBackHair = (faceRadius, faceX, faceY, hairRadius) => {
@@ -57,7 +73,7 @@ export default function CanvasDollLittlePrincess() {
             context.save();
             context.beginPath();
             context.arc(faceX, faceY, radius, Math.PI, Math.PI * 2, false);
-            context.fillStyle = '#FFFFFF';
+            context.fillStyle = '#121212';
             context.fill();
             context.restore();
 
@@ -67,10 +83,18 @@ export default function CanvasDollLittlePrincess() {
             context.save();
             context.beginPath();
             context.moveTo(x, y);
-            context.bezierCurveTo(x, y, x + 5, y + radius * 0.75, x - 5, y + radius * 1.5 + 10);
-            context.lineTo((x + radius * 2) + 5, y + radius * 1.5 + 10);
-            context.bezierCurveTo((x + radius * 2) + 5, y + radius * 1.5 + 10, (x + radius * 2) - 5, y + radius * 0.75, (x + radius * 2), y);
-            context.fillStyle = '#FFFFFF';
+            context.bezierCurveTo(x, y, x - 2, y + radius * 0.325, x, y + radius * 0.75);
+            context.bezierCurveTo(x, y + radius * 0.75, x - 3, y + radius * 1.075, x - 1, y + radius * 1.5);
+            context.bezierCurveTo(x - 1, y + radius * 1.5, x - 4, y + radius * 1.5 + 5, x - 3, y + radius * 1.5 + 10);
+            // 우측
+            // context.lineTo((x + radius * 2) + 7, y + radius * 1.5 + 20);
+            context.bezierCurveTo(x - 3, y + radius * 1.5 + 10, (x + radius), y + radius * 1.5 + 20, (x + radius * 2) + 3, y + radius * 1.5 + 10);
+            // context.bezierCurveTo(x - 1, y + radius * 1.5, (x + radius), y + radius * 1.5 + 5, (x + radius * 2) + 1, y + radius * 1.5);
+            // 좌측
+            context.bezierCurveTo((x + radius * 2) + 3, y + radius * 1.5 + 10, (x + radius * 2) + 4, y + radius * 1.5 + 5, (x + radius * 2) + 1, y + radius * 1.5);
+            context.bezierCurveTo((x + radius * 2) + 1, y + radius * 1.5, (x + radius * 2) + 3, y + radius * 1.075, (x + radius * 2), y + radius * 0.75);
+            context.bezierCurveTo((x + radius * 2), y + radius * 0.75, (x + radius * 2) + 2, y + radius * 0.325, (x + radius * 2), y);
+            context.fillStyle = '#121212';
             context.fill();
             context.restore();
         }
@@ -82,7 +106,30 @@ export default function CanvasDollLittlePrincess() {
             context.closePath();
             context.fillStyle = '#FFFFFF';
             context.fill();
+            context.lineWidth = 3;
+            context.strokeStyle = '#121212';
+            context.stroke();
             context.restore();
+
+            context.save();
+            context.beginPath();
+            context.arc(faceX, faceY, faceRadius - 3, Math.PI * 0, Math.PI * 1, true);
+            context.closePath();
+            context.fillStyle = '#121212';
+            context.fill();
+            context.restore();
+
+            context.save();
+            context.beginPath();
+            context.arc(faceX, faceY + 2, faceRadius - 5, Math.PI * 0, Math.PI * 1, true);
+            context.closePath();
+            context.fillStyle = '#FBCEB1';
+            context.fill();
+            context.strokeStyle = '#FBCEB1';
+            context.stroke();
+            context.restore();
+
+            drawRoundedRectangle(faceX - 5, faceY - 15, 10, 5, 0, 'fill', '#121212', 1);
         }
 
         const drawDollNeck = (centerX, centerY, headRadius, neckHeight) => {
@@ -93,24 +140,87 @@ export default function CanvasDollLittlePrincess() {
             const radius = 0;
             const type = 'fill';
 
+            drawRoundedRectangle(x - 5, y, width + 10, height, 2, type, '#008080', 1);
             drawRoundedRectangle(x, y, width, height, radius, type, '#FBCEB1', 1);
+            drawRoundedRectangle(x - 5, y + 2, width + 10, height - 1, 2, type, '#008C8C', 1);
         }
 
         const drawDollBody = (centerX, centerY, headRadius, hairRadius, neckHeight, bodyRadius, bodyHeight) => {
             const radius = bodyRadius;
             const x = centerX;
             const y = centerY + headRadius + hairRadius + neckHeight;
+            const pants = 7;
+            const coat = bodyHeight - pants;
 
-            context.save();
-            context.beginPath();
-            context.arc(x, y, radius, Math.PI, Math.PI * 2, false);
-            context.moveTo(x - radius, y);
-            context.lineTo(x - radius, y + bodyHeight);
-            context.lineTo(x + radius, y + bodyHeight);
-            context.lineTo(x + radius, y);
-            context.fillStyle = '#964B00';
-            context.fill();
-            context.restore();
+            const drawDollCoat = () => {
+                context.save();
+                context.beginPath();
+                context.arc(x, y, radius, Math.PI, Math.PI * 2, false);
+                context.moveTo(x - radius, y);
+                context.lineTo(x - radius, y + coat);
+                context.lineTo(x + radius, y + coat);
+                context.lineTo(x + radius, y);
+                context.fillStyle = '#6d443b';
+                context.fill();
+                context.restore();
+
+                const drawDollCoatArm = (direction) => {
+                    const armRadius = radius - 2;
+                    const relativeX = direction === 'right' ? x - 6 : x + 6;
+                    const relativeY = y + 1;
+                    const armHeight = coat - 12;
+                    context.save();
+                    context.beginPath();
+                    context.arc(relativeX, relativeY, armRadius, direction === 'right' ? -Math.PI * 1 : Math.PI * 1.5, direction === 'right' ? -Math.PI * 0.5 : Math.PI * 2, false);
+                    context.moveTo(relativeX, relativeY - armRadius);
+                    context.lineTo(relativeX, relativeY + armHeight);
+                    context.lineTo(direction === 'right' ? relativeX - armRadius : relativeX + armRadius, relativeY + armHeight);
+                    context.lineTo(direction === 'right' ? relativeX - armRadius : relativeX + armRadius, relativeY);
+                    context.fillStyle = '#553a35';
+                    context.fill();
+                    context.restore();
+
+                    const handRadiusDistance = 4
+                    const handRelativeX = direction === 'right' ? relativeX - handRadiusDistance : relativeX + handRadiusDistance;
+                    context.save();
+                    context.beginPath();
+                    context.arc(handRelativeX, relativeY + armHeight, armRadius - handRadiusDistance, Math.PI * 1, Math.PI * 2, true);
+                    context.fillStyle = '#FBCEB1';
+                    context.fill();
+                    context.restore();
+                }
+
+                drawDollCoatArm('right');
+                drawDollCoatArm('left');
+            }
+
+            const drawDollPants = () => {
+                context.save();
+                context.beginPath();
+                context.moveTo(x - radius, y + coat);
+                context.lineTo(x - radius, y + coat + pants);
+                context.lineTo(x + radius, y + coat + pants);
+                context.lineTo(x + radius, y + coat);
+                context.fillStyle = '#0A6EFF';
+                context.fill();
+                context.restore();
+            }
+
+            const drawDollShoes = (direction) => {
+                const relativeX = direction === 'right' ? x - 5 : x + 5;
+                const relativey = y + coat + pants + 1;
+                context.save();
+                context.beginPath();
+                context.arc(relativeX, relativey, 4, Math.PI * 1, Math.PI * 2, false);
+                context.fillStyle = '#4d3b33';
+                context.fill();
+                context.restore();
+            }
+
+            drawDollCoat();
+            drawDollPants();
+            drawDollShoes('right');
+            drawDollShoes('left');
         }
 
         const drawClawCraneGameGlass = (centerX, centerY) => {
@@ -122,7 +232,7 @@ export default function CanvasDollLittlePrincess() {
             const type = 'fill';
 
             drawRoundedRectangle(x, y, width, height, radius, type, 'rgba(246, 254, 255, 0.5)', 1); // 유리 앞면
-            drawRoundedRectangle(x - 1, y + height - 10, width + 2, 10, radius, type, '#008080', 1); // 유리 하단(유리 거치대)
+            // drawRoundedRectangle(x - 1, y + height - 5, width + 2, 5, radius, type, '#008080', 1); // 유리 하단(유리 거치대)
         }
 
         /** @param {*} type (타입 : line(선), fill(채우기)) */
