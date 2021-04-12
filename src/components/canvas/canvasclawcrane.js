@@ -11,7 +11,7 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAu
     const joystickDegree = useRef(0);
     const downbuttonAnimationSpeed = useRef(1);
     const downbuttonDirection = useRef();
-    const craneDirection = useRef('down');
+    const craneDirection = useRef('stop');
     const craneMoveX = useRef(0);
     const craneMoveY = useRef(0);
     const centerX = useRef(0);
@@ -149,9 +149,8 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAu
             }
 
             let craneHandIsOpen = false;
-            if(craneDirection.current === 'up' 
-                || craneDirection.current === 'left' 
-                || craneMoveY.current > craneMinMoveY) {
+            if(craneDirection.current === 'down' 
+                || craneDirection.current === 'stop') {
                 craneHandIsOpen = true;
             } else {
                 craneHandIsOpen = false;
@@ -373,9 +372,11 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAu
             if(calculate === maxY) {
                 handleSetAudioCatchIsPlay(true);
                 cancelAnimationFrame(raf.current);
+                craneDirection.current = 'down';
                 startAnimation(animateCrane);
+            } else {
+                startAnimation(animateDownbutton);
             }
-            startAnimation(animateDownbutton);
         }
 
         const animateCrane = time => {
@@ -389,24 +390,32 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAu
             } else if(craneDirection.current === 'left') {
                 craneMoveX.current = Math.max(craneMoveX.current - progress * 0.001, craneMinMoveX);
             }
+
             drawClawCraneGameGlass(centerX.current, centerY.current);
             handleCrane(craneDirection.current, craneMoveX.current, craneMoveY.current);
 
+            // 방향 설정
             if(craneMoveY.current === craneMaxMoveY) {
                 craneDirection.current = 'up';
             } else if(craneMoveY.current === craneMinMoveY) {
                 if(craneMoveX.current === craneMinMoveX) {
-                    craneDirection.current = 'down';
-                    downbuttonDirection.current = undefined;
-                    downbuttonAnimationSpeed.current = 1;
-                    cancelAnimation();
-                    drawClawCraneGameControlBox(centerX.current, centerY.current, 0, 0);
-                    handleSetAudioCatchIsStop(true);
+                    craneDirection.current = 'stop';
                 } else {
                     craneDirection.current = 'left';
                 }
             }
-            startAnimation(animateCrane);
+
+            if(craneDirection.current === 'stop') {
+                handleSetAudioCatchIsStop(true);
+                downbuttonDirection.current = undefined;
+                downbuttonAnimationSpeed.current = 1;
+                cancelAnimation();
+                drawClawCraneGameControlBox(centerX.current, centerY.current, 0, 0);
+                drawClawCraneGameGlass(centerX.current, centerY.current);
+                handleCrane(craneDirection.current, craneMoveX.current, craneMoveY.current);
+            } else {
+                startAnimation(animateCrane);
+            }
         }
 
         const startAnimation = (animate) => {
@@ -431,14 +440,14 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAu
 
         const handleKeydown = (event) => {
             const playAnimationJoystick = (direction) => {
-                if(craneMoveY.current === 0 && craneDirection.current === 'down') { // 초기상태 체크
+                if(craneMoveY.current === 0 && craneDirection.current === 'stop') { // 초기상태 체크
                     cancelAnimationFrame(raf.current);
                     joystickDirection.current = direction;
                     startAnimation(animateJoystick);
                 }
             }
             const playAnimationDownbutton = (direction) => {
-                if(craneMoveY.current === 0 && craneDirection.current === 'down') { // 초기상태 체크
+                if(craneMoveY.current === 0 && craneDirection.current === 'stop') { // 초기상태 체크
                     cancelAnimationFrame(raf.current);
                     downbuttonDirection.current = direction;
                     startAnimation(animateDownbutton);
@@ -456,7 +465,7 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAu
 
         const handleKeyUp = (event) => {
             const stopAnimationJoystick = () => {
-                if(craneMoveY.current === 0 && craneDirection.current === 'down') { // 초기상태 체크
+                if(craneMoveY.current === 0 && craneDirection.current === 'stop') { // 초기상태 체크
                     joystickDirection.current = undefined;
                     joystickAnimationSpeed.current = 1;
                     joystickDegree.current = 0;

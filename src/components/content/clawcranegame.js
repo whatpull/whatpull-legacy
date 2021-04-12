@@ -27,13 +27,9 @@ export default function ClawCraneGame() {
         }
     }, []);
     const handleCrane = useCallback((craneDirection, craneMoveX, craneMoveY) => {
-        if(craneDirection === 'down') {
-            
-        } else {
-            setCraneDirection(craneDirection);
-            setCraneMoveX(craneMoveX);
-            setCraneMoveY(craneMoveY);
-        }
+        setCraneDirection(craneDirection);
+        setCraneMoveX(craneMoveX);
+        setCraneMoveY(craneMoveY);
     }, [])
     const animationCrane = useCallback(() => { 
         return {craneDirection: craneDirection, craneMoveX: craneMoveX, craneMoveY: craneMoveY}

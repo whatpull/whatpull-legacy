@@ -32,11 +32,11 @@ export default function CanvasDollLittlePrincess({ isCatch, animationCrane }) {
 
             const animate = animationCrane();
             const x = centerX.current + animate.craneMoveX;
-            const y = centerY.current - bodyRadius - bodyHeight + (animate.craneMoveY - 100);
+            const y = centerY.current - bodyRadius - bodyHeight + ((isCatch && (animate.craneDirection === 'up' || animate.craneDirection === 'left')) ? (animate.craneMoveY - 100) : 0);
             drawDollHead(x, y, headRadius, hairRadius);
             drawDollBody(x, y, headRadius, hairRadius, neckHeight, bodyRadius, bodyHeight);
             drawDollNeck(x, y, headRadius, neckHeight);
-            // drawClawCraneGameGlass(centerX.current, centerY.current);
+            drawClawCraneGameGlass(centerX.current, centerY.current);
         }
 
         const drawDollHead = (centerX, centerY, headRadius, hairRadius) => {
