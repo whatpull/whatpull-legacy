@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import * as style from './canvasclawcrane.module.css';
 
-export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAudioCatchIsStop, handleCrane }) {
+export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAudioCatchIsStop, handleCrane, dollIsCaught }) {
     const [context, setContext] = useState();
     const canvas = useRef();
     const raf = useRef();
@@ -11,7 +11,7 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAu
     const joystickDegree = useRef(0);
     const downbuttonAnimationSpeed = useRef(1);
     const downbuttonDirection = useRef();
-    const craneDirection = useRef('stop');
+    const craneDirection = useRef('start');
     const craneMoveX = useRef(0);
     const craneMoveY = useRef(0);
     const centerX = useRef(0);
@@ -412,7 +412,7 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAu
                 drawClawCraneGameGlass(centerX.current, centerY.current);
                 handleCrane(craneDirection.current, craneMoveX.current, craneMoveY.current);
                 cancelAnimation();
-                handleSetAudioCatchIsStop(true);
+                handleSetAudioCatchIsStop(true); // 순서가 중요합니다.
             } else {
                 startAnimation(animateCrane);
             }
@@ -440,14 +440,14 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAu
 
         const handleKeydown = (event) => {
             const playAnimationJoystick = (direction) => {
-                if(craneMoveY.current === 0 && craneDirection.current === 'stop') { // 초기상태 체크
+                if(craneMoveY.current === 0 && (craneDirection.current === 'start' || craneDirection.current === 'stop') && dollIsCaught === false) { // 초기상태 체크
                     cancelAnimationFrame(raf.current);
                     joystickDirection.current = direction;
                     startAnimation(animateJoystick);
                 }
             }
             const playAnimationDownbutton = (direction) => {
-                if(craneMoveY.current === 0 && craneDirection.current === 'stop') { // 초기상태 체크
+                if(craneMoveY.current === 0 && (craneDirection.current === 'start' || craneDirection.current === 'stop') && dollIsCaught === false) { // 초기상태 체크
                     cancelAnimationFrame(raf.current);
                     downbuttonDirection.current = direction;
                     startAnimation(animateDownbutton);
@@ -465,7 +465,8 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAu
 
         const handleKeyUp = (event) => {
             const stopAnimationJoystick = () => {
-                if(craneMoveY.current === 0 && craneDirection.current === 'stop') { // 초기상태 체크
+                console.log(dollIsCaught);
+                if(craneMoveY.current === 0 && (craneDirection.current === 'start' || craneDirection.current === 'stop') && dollIsCaught === false) { // 초기상태 체크
                     joystickDirection.current = undefined;
                     joystickAnimationSpeed.current = 1;
                     joystickDegree.current = 0;
@@ -509,7 +510,7 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAu
                 clearContext();
             }
         }
-    }, [context, handleSetAudioCatchIsPlay, handleSetAudioCatchIsStop, handleCrane])
+    }, [context, handleSetAudioCatchIsPlay, handleSetAudioCatchIsStop, handleCrane, dollIsCaught])
     
     return (
         <canvas

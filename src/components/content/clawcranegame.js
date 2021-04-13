@@ -4,10 +4,11 @@ import CanvasCrawCrane from '../canvas/canvasclawcrane'
 import CanvasDollLittlePrincess from '../canvas/canvasdolllittleprincess'
 
 export default function ClawCraneGame() {
-    const [isCatch, setIsCatch] = useState(false);
+    const [craneIsCatch, setCraneIsCatch] = useState(false);
     const [craneDirection, setCraneDirection] = useState('down');
     const [craneMoveX, setCraneMoveX] = useState(0);
     const [craneMoveY, setCraneMoveY] = useState(0);
+    const [dollIsCaught, setDollIsCaught] = useState(false);
     const audioMain = useRef();
     const audioCatch = useRef();
     const audioContext = useRef();
@@ -16,13 +17,13 @@ export default function ClawCraneGame() {
     const buttonRight = useRef();
     const handleSetAudioCatchIsPlay = useCallback((isPlay) => {
         if(isPlay) { 
-            setIsCatch(true);
+            setCraneIsCatch(true);
             audioPlay(audioCatch.current);
         }
     }, []);
     const handleSetAudioCatchIsStop = useCallback((isStop) => {
         if(isStop) { 
-            setIsCatch(false);
+            setCraneIsCatch(false);
             audioStop(audioCatch.current);
         }
     }, []);
@@ -34,6 +35,9 @@ export default function ClawCraneGame() {
     const animationCrane = useCallback(() => { 
         return {craneDirection: craneDirection, craneMoveX: craneMoveX, craneMoveY: craneMoveY}
     }, [craneDirection, craneMoveX, craneMoveY])
+    const handleSetDollIsCaught = useCallback((isCaught) => {
+        setDollIsCaught(isCaught);
+    }, [])
 
     const audioStop = (element) => {
         if(audioContext.current && audioContext.current.state === 'running') {
@@ -142,12 +146,14 @@ export default function ClawCraneGame() {
         <div
             className={style.clawcranegame__canvasWrap}>
             <CanvasDollLittlePrincess 
-                isCatch={isCatch}
-                animationCrane={animationCrane} />
+                craneIsCatch={craneIsCatch}
+                animationCrane={animationCrane}
+                handleSetDollIsCaught={handleSetDollIsCaught} />
             <CanvasCrawCrane 
                 handleSetAudioCatchIsPlay={handleSetAudioCatchIsPlay}
                 handleSetAudioCatchIsStop={handleSetAudioCatchIsStop}
-                handleCrane={handleCrane} />
+                handleCrane={handleCrane}
+                dollIsCaught={dollIsCaught} />
             <div
                 className={style.clawcranegame__keyWrap}>
                 <button

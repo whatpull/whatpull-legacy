@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import * as style from './canvasdolllittleprincess.module.css'
 
-export default function CanvasDollLittlePrincess({ isCatch, animationCrane }) {
+export default function CanvasDollLittlePrincess({ craneIsCatch, animationCrane, handleSetDollIsCaught }) {
     const [context, setContext] = useState();
     const canvas = useRef();
     const centerX = useRef(0);
     const centerY = useRef(0);
+    const isCaught = useRef(false);
 
     useEffect(() => {
         const ratio = 1.5;
@@ -31,12 +32,30 @@ export default function CanvasDollLittlePrincess({ isCatch, animationCrane }) {
             const bodyHeight = 30;
 
             const animate = animationCrane();
-            const x = centerX.current + animate.craneMoveX;
-            const y = centerY.current - bodyRadius - bodyHeight + ((isCatch && (animate.craneDirection === 'up' || animate.craneDirection === 'left')) ? (animate.craneMoveY - 100) : 0);
+            let x = centerX.current;
+            let y = centerY.current - bodyRadius - bodyHeight;
+            const absX = 5;
+            // 인형 잡힘여부
+            if(animate.craneDirection === 'stop') {
+                if(isCaught.current) {
+                    x = x + animate.craneMoveX;
+                    handleSetDollIsCaught(true);
+                }
+            } else if(animate.craneDirection === 'down') {
+                if(((x + animate.craneMoveX) - absX <= centerX.current && (x + animate.craneMoveX) + absX >= centerX.current)) {
+                    if(animate.craneMoveY === 100) {
+                        isCaught.current = true;
+                    }
+                }
+            }
+            if(isCaught.current) {
+                x = x + ((craneIsCatch && (animate.craneDirection === 'up' || animate.craneDirection === 'left')) ? animate.craneMoveX : 0);
+                y = y + ((craneIsCatch && (animate.craneDirection === 'up' || animate.craneDirection === 'left')) ? (animate.craneMoveY - 100) : 0);
+            }
             drawDollHead(x, y, headRadius, hairRadius);
             drawDollBody(x, y, headRadius, hairRadius, neckHeight, bodyRadius, bodyHeight);
             drawDollNeck(x, y, headRadius, neckHeight);
-            drawClawCraneGameGlass(centerX.current, centerY.current);
+            // drawClawCraneGameGlass(centerX.current, centerY.current);
         }
 
         const drawDollHead = (centerX, centerY, headRadius, hairRadius) => {
@@ -309,7 +328,7 @@ export default function CanvasDollLittlePrincess({ isCatch, animationCrane }) {
                 clearContext();
             }
         }
-    }, [context, isCatch, animationCrane])
+    }, [context, craneIsCatch, animationCrane, handleSetDollIsCaught])
 
     return (
         <canvas
