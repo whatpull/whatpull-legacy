@@ -290,6 +290,7 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAu
                 drawRoundedRectangle(x + 3, y + 3, width, height, radius, type, 'rgba(0, 0, 0, 0.1)', 1); // 출구 그림자
                 drawRoundedRectangle(x, y, width, height, radius, type, 'rgba(246, 254, 255, 0.7)', 1); // 출구 유리    
             }
+            
             const exitBoxHandle = () => {
                 const width = 80;
                 const height = 6;
