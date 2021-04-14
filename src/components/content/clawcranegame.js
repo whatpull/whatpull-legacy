@@ -20,14 +20,11 @@ export default function ClawCraneGame() {
     const buttonRight = useRef();
     const handleSetAudioCatchIsPlay = useCallback((isPlay) => {
         if(isPlay) { 
-            setCraneIsCatch(true);
             audioPlay(audioCatch.current);
-        }
-    }, []);
-    const handleSetAudioCatchIsStop = useCallback((isStop) => {
-        if(isStop) { 
-            setCraneIsCatch(false);
+            setCraneIsCatch(true);
+        } else {
             audioStop(audioCatch.current);
+            setCraneIsCatch(false);
         }
     }, []);
     const handleCrane = useCallback((craneDirection, craneMoveX, craneMoveY, progress) => {
@@ -53,8 +50,9 @@ export default function ClawCraneGame() {
     }
 
     const audioPlay = (element) => {
+        // TODO.오디오 개발 다시 수행(전체) - 소스를 모두 분리하여 가지고 있어야한다.(중첩안됨)
         if(typeof audioContext.current === 'undefined') {
-            audioContext.current = new AudioContext()
+            audioContext.current = new AudioContext();
             const destination = audioContext.current.destination;
             const source = audioContext.current.createMediaElementSource(element);
             const gain = audioContext.current.createGain();
@@ -79,10 +77,10 @@ export default function ClawCraneGame() {
         const handleKeydown = (event) => {
             if(event.keyCode === 39) { // Right
                 buttonRight.current.classList.add(style.clawcranegame__keyItemActive);
-                if(!dollIsCaught) audioPlay(audioMain.current);
+                if(dollIsCaught === false) audioPlay(audioMain.current);
             } else if(event.keyCode === 37) { // Left
                 buttonLeft.current.classList.add(style.clawcranegame__keyItemActive);
-                if(!dollIsCaught) audioPlay(audioMain.current);
+                if(dollIsCaught === false) audioPlay(audioMain.current);
             }
             if(event.keyCode === 40) { // Down
                 buttonDown.current.classList.add(style.clawcranegame__keyItemActive);
@@ -107,7 +105,7 @@ export default function ClawCraneGame() {
             }
         }
 
-        // 잡을 경우 1초뒤 이동
+        // 잡을 경우 3초뒤 이동
         if(dollIsCaught) {
             audioStop(audioCatch.current);
             audioPlay(audioCaught.current);
@@ -163,7 +161,6 @@ export default function ClawCraneGame() {
             className={style.clawcranegame__canvasWrap}>
             <CanvasCrawCrane 
                 handleSetAudioCatchIsPlay={handleSetAudioCatchIsPlay}
-                handleSetAudioCatchIsStop={handleSetAudioCatchIsStop}
                 handleCrane={handleCrane}
                 dollIsCaught={dollIsCaught} />
             <CanvasDollLittlePrincess 

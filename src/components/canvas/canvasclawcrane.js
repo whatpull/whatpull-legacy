@@ -3,7 +3,7 @@ import * as style from './canvasclawcrane.module.css';
 import icon_wp from '../../images/icon_small.png';
 import icon_py from '../../images/icon_py_small.png';
 
-export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAudioCatchIsStop, handleCrane, dollIsCaught }) {
+export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleCrane, dollIsCaught }) {
     const [context, setContext] = useState();
     const canvas = useRef();
     const raf = useRef();
@@ -434,13 +434,13 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAu
             }
 
             if(craneDirection.current === 'stop') {
+                handleSetAudioCatchIsPlay(false);
                 downbuttonDirection.current = undefined;
                 downbuttonAnimationSpeed.current = 1;
                 drawClawCraneGameControlBox(centerX.current, centerY.current, 0, 0);
                 drawClawCraneGameGlass(centerX.current, centerY.current);
                 cancelAnimation();
                 handleCrane(craneDirection.current, craneMoveX.current, craneMoveY.current);
-                handleSetAudioCatchIsStop(true); // 순서가 중요합니다.
             } else {
                 startAnimation(animateCrane);
             }
@@ -567,7 +567,7 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAu
                 clearContext();
             }
         }
-    }, [context, handleSetAudioCatchIsPlay, handleSetAudioCatchIsStop, handleCrane, dollIsCaught])
+    }, [context, handleSetAudioCatchIsPlay, handleCrane, dollIsCaught])
     
     return (
         <canvas
