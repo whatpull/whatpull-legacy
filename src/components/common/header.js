@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react'
-import TransitionLink from "gatsby-plugin-transition-link"
-import * as style from './header.module.css'
-import icon from '../../images/icon.png'
+import React, { useState, useEffect, useRef } from 'react';
+import TransitionLink from "gatsby-plugin-transition-link";
+import * as style from './header.module.css';
+import icon from '../../images/icon.png';
 
 export default function Header() {
     const [context, setContext] = useState();
@@ -35,13 +35,13 @@ export default function Header() {
 
             context.save();
             context.beginPath();
-            context.globalCompositeOperation="source-in";
+            context.globalCompositeOperation='source-in';
             context.drawImage(patternImage.current, 0, 0, 250, (250 / patternImage.current.width) * patternImage.current.height);
             context.restore();
         }
 
         const animate = time => {
-            if(typeof rafStartTime.current === "undefined") rafStartTime.current = time;
+            if(typeof rafStartTime.current === 'undefined') rafStartTime.current = time;
             const progress = time - rafStartTime.current;
             // TODO. 정확한 width 측정방법 확인
             const drawContext_text_width = context.measureText(defaultText).width + 250;
@@ -64,17 +64,17 @@ export default function Header() {
         }
 
         const loadImage = (callback) => {
-            if(typeof patternImage.current === "undefined") patternImage.current = new Image(1200, 750);
+            if(typeof patternImage.current === 'undefined') patternImage.current = new Image(1200, 750);
             patternImage.current.onload = function() {
-                if(typeof callback === "function") callback();
+                if(typeof callback === 'function') callback();
             }
             patternImage.current.src = '/pattern_v1.jpeg';
         }
 
         // 초기 호출 함수
         if(canvas) {
-            if(typeof context === "undefined") {
-                setContext(canvas.current.getContext("2d"));
+            if(typeof context === 'undefined') {
+                setContext(canvas.current.getContext('2d'));
             }
             if(context) {
                 loadImage(() => {

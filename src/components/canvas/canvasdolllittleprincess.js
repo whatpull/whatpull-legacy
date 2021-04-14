@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import * as style from './canvasdolllittleprincess.module.css'
+import * as style from './canvasdolllittleprincess.module.css';
 
 export default function CanvasDollLittlePrincess({ craneIsCatch, animationCrane, handleSetDollIsCaught }) {
     const [context, setContext] = useState();

@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react'
-import { navigate } from 'gatsby'
-import * as style from './clawcranegame.module.css'
-import CanvasCrawCrane from '../canvas/canvasclawcrane'
-import CanvasDollLittlePrincess from '../canvas/canvasdolllittleprincess'
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { navigate } from 'gatsby';
+import * as style from './clawcranegame.module.css';
+import CanvasCrawCrane from '../canvas/canvasclawcrane';
+import CanvasDollLittlePrincess from '../canvas/canvasdolllittleprincess';
 
 export default function ClawCraneGame() {
     const [craneIsCatch, setCraneIsCatch] = useState(false);

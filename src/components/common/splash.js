@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react'
-import * as style from './splash.module.css'
+import React, { useState, useEffect, useRef } from 'react';
+import * as style from './splash.module.css';
 
 export default function Splash({ mount }) {
     const [context, setContext] = useState();

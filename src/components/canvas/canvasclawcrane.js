@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import * as style from './canvasclawcrane.module.css';
+import icon_wp from '../../images/icon_small.png';
+import icon_py from '../../images/icon_py_small.png';
 
 export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAudioCatchIsStop, handleCrane, dollIsCaught }) {
     const [context, setContext] = useState();
@@ -16,6 +18,8 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAu
     const craneMoveY = useRef(0);
     const centerX = useRef(0);
     const centerY = useRef(0);
+    const logoWPImage = useRef();
+    const logoPYImage = useRef();
 
     useEffect(() => {
         const craneMinMoveX = -80;
@@ -39,6 +43,7 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAu
             context.fillStyle = '#FFFFFF';
 
             drawClawCraneGameBody(centerX.current, centerY.current);
+            drawClawCraneGameLogo(centerX.current, centerY.current);
             drawClawCraneGameHead(centerX.current, centerY.current);
             drawClawCraneGameFoot(centerX.current, centerY.current);
         }
@@ -305,6 +310,28 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAu
             exitBoxHandle();
         }
 
+        const drawClawCraneGameLogo = (centerX, centerY) => {
+            context.save();
+            context.beginPath();
+            context.globalCompositeOperation='source-atop';
+            context.drawImage(logoWPImage.current, centerX + 97, centerY + 160, 40, 40);
+            context.restore();
+
+            context.save();
+            context.beginPath();
+            context.globalCompositeOperation='source-atop';
+            context.drawImage(logoPYImage.current, centerX + 52, centerY + 160, 40, 40);
+            context.restore();
+
+            context.save();
+            context.beginPath();
+            context.font = '12px Roboto';
+            context.textBaseline = 'middle';
+            context.fillText('Music by parkyarn', centerX + 40, centerY + 210);
+            context.fill();
+            context.restore();
+        }
+
         const drawClawCraneGameFoot = (centerX, centerY) => {
             const width = 310;
             const height = 25;
@@ -482,6 +509,32 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAu
                 stopAnimationJoystick();
             }
         }
+
+        const loadImage = (callback) => {
+            const loadLogoWPImage = (callback) => { // 왓풀 로고
+                if(typeof logoWPImage.current === 'undefined')  {
+                    logoWPImage.current = new Image();
+                    logoWPImage.current.onload = function() {
+                        if(typeof callback === 'function') callback();
+                    }
+                    logoWPImage.current.src = icon_wp;
+                } else {
+                    if(typeof callback === 'function') callback();
+                }
+            }
+            const loadLogoPYImage = (callback) => { // 박얀 로고
+                if(typeof logoPYImage.current === 'undefined') {
+                    logoPYImage.current = new Image();
+                    logoPYImage.current.onload = function() {
+                        if(typeof callback === 'function') callback();
+                    }
+                    logoPYImage.current.src = icon_py;
+                } else {
+                    if(typeof callback === 'function') callback();
+                }
+            }
+            loadLogoWPImage(() => { loadLogoPYImage(callback); });
+        }
         
         // 초기 호출 함수
         if(canvas) {
@@ -489,14 +542,16 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAu
                 setContext(canvas.current.getContext("2d"));
             }
             if(context) {
-                clearContext();
-                initCanvas();
-                window.addEventListener('resize', initCanvas);
-                window.addEventListener('keydown', handleKeydown);
-                window.addEventListener('keyup', handleKeyUp);
-                window.addEventListener("contextmenu", e => e.preventDefault());
-                window.addEventListener("dragstart", e => e.preventDefault());
-                window.addEventListener("selectstart", e => e.preventDefault());
+                loadImage(() => {
+                    clearContext();
+                    initCanvas();
+                    window.addEventListener('resize', initCanvas);
+                    window.addEventListener('keydown', handleKeydown);
+                    window.addEventListener('keyup', handleKeyUp);
+                    window.addEventListener('contextmenu', e => e.preventDefault());
+                    window.addEventListener('dragstart', e => e.preventDefault());
+                    window.addEventListener('selectstart', e => e.preventDefault());
+                })
             }
         }
 
