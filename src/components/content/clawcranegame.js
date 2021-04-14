@@ -108,8 +108,8 @@ export default function ClawCraneGame() {
         }
 
         // 잡을 경우 1초뒤 이동
-        handleSetAudioCatchIsStop(true);
-        if(dollIsCaught) { 
+        if(dollIsCaught) {
+            audioStop(audioCatch.current);
             audioPlay(audioCaught.current);
             setTimeout(() => { 
                 audioStop(audioMain.current);
