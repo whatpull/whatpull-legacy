@@ -325,9 +325,9 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAu
 
             context.save();
             context.beginPath();
-            context.font = '12px Roboto';
+            context.font = '9px Roboto';
             context.textBaseline = 'middle';
-            context.fillText('Music by parkyan', centerX + 40, centerY + 210);
+            context.fillText('Music by ParkYan', centerX + 60, centerY + 210);
             context.fill();
             context.restore();
         }
@@ -438,8 +438,8 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAu
                 downbuttonAnimationSpeed.current = 1;
                 drawClawCraneGameControlBox(centerX.current, centerY.current, 0, 0);
                 drawClawCraneGameGlass(centerX.current, centerY.current);
-                handleCrane(craneDirection.current, craneMoveX.current, craneMoveY.current);
                 cancelAnimation();
+                handleCrane(craneDirection.current, craneMoveX.current, craneMoveY.current);
                 handleSetAudioCatchIsStop(true); // 순서가 중요합니다.
             } else {
                 startAnimation(animateCrane);

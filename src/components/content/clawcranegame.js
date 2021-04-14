@@ -13,6 +13,7 @@ export default function ClawCraneGame() {
     const [dollIsCaught, setDollIsCaught] = useState(false);
     const audioMain = useRef();
     const audioCatch = useRef();
+    const audioCaught = useRef();
     const audioContext = useRef();
     const buttonLeft = useRef();
     const buttonDown = useRef();
@@ -107,7 +108,16 @@ export default function ClawCraneGame() {
         }
 
         // 잡을 경우 1초뒤 이동
-        if(dollIsCaught) { setTimeout(() => { navigate('/animation/01'); }, 3000); }
+        handleSetAudioCatchIsStop(true);
+        if(dollIsCaught) { 
+            audioPlay(audioCaught.current);
+            setTimeout(() => { 
+                audioStop(audioMain.current);
+                audioStop(audioCatch.current);
+                audioStop(audioCaught.current);
+                navigate('/animation/01'); 
+            }, 3000); 
+        }
         
         window.addEventListener('keydown', handleKeydown);
         window.addEventListener('keyup', handleKeyUp);
@@ -214,6 +224,12 @@ export default function ClawCraneGame() {
                 loop>
                 <source src="/crawcranegame_catch.ogg" type="audio/ogg" />
                 <source src="/crawcranegame_catch.mp3" type="audio/mpeg" />
+                <track src="/common.vtt" kind="captions" srcLang="ko" label="Korea" />
+            </audio>
+            <audio
+                ref={audioCaught}>
+                <source src="/crawcranegame_caught.ogg" type="audio/ogg" />
+                <source src="/crawcranegame_caught.mp3" type="audio/mpeg" />
                 <track src="/common.vtt" kind="captions" srcLang="ko" label="Korea" />
             </audio>
         </div>
