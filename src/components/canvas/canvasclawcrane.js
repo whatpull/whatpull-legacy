@@ -327,7 +327,7 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAu
             context.beginPath();
             context.font = '12px Roboto';
             context.textBaseline = 'middle';
-            context.fillText('Music by parkyarn', centerX + 40, centerY + 210);
+            context.fillText('Music by parkyan', centerX + 40, centerY + 210);
             context.fill();
             context.restore();
         }
