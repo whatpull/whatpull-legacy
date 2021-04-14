@@ -12,7 +12,7 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAu
     const downbuttonAnimationSpeed = useRef(1);
     const downbuttonDirection = useRef();
     const craneDirection = useRef('start');
-    const craneMoveX = useRef(0);
+    const craneMoveX = useRef(-80);
     const craneMoveY = useRef(0);
     const centerX = useRef(0);
     const centerY = useRef(0);
@@ -362,7 +362,7 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAu
         }
 
         const animateDownbutton = time => {
-            if(typeof rafStartTime.current === "undefined") rafStartTime.current = time;
+            if(typeof rafStartTime.current === 'undefined') rafStartTime.current = time;
             const progress = time - rafStartTime.current;
 
             const maxY = 3;
@@ -380,7 +380,7 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAu
         }
 
         const animateCrane = time => {
-            if(typeof rafStartTime.current === "undefined") rafStartTime.current = time;
+            if(typeof rafStartTime.current === 'undefined') rafStartTime.current = time;
             const progress = time - rafStartTime.current;
 
             if(craneDirection.current === 'down') {
@@ -392,7 +392,7 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAu
             }
 
             drawClawCraneGameGlass(centerX.current, centerY.current);
-            handleCrane(craneDirection.current, craneMoveX.current, craneMoveY.current);
+            handleCrane(craneDirection.current, craneMoveX.current, craneMoveY.current, progress);
 
             // 방향 설정
             if(craneMoveY.current === craneMaxMoveY) {
@@ -429,13 +429,15 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAu
         }
 
         const initCanvas = () => {
-            context.canvas.width = canvas.current.clientWidth * ratio;
-            context.canvas.height = canvas.current.clientHeight * ratio;
-            centerX.current = context.canvas.width / 2;
-            centerY.current = context.canvas.height / 2;
-            clearContext();
-            drawContext();
-            context.imageSmoothingEnabled = true;
+            if(canvas.current) {
+                context.canvas.width = canvas.current.clientWidth * ratio;
+                context.canvas.height = canvas.current.clientHeight * ratio;
+                centerX.current = context.canvas.width / 2;
+                centerY.current = context.canvas.height / 2;
+                clearContext();
+                drawContext();
+                context.imageSmoothingEnabled = true;
+            }
         }
 
         const handleKeydown = (event) => {

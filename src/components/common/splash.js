@@ -19,13 +19,15 @@ export default function Splash({ mount }) {
 
     useEffect(() => {
         const initCanvas = (progress) => {
-            context.canvas.width = canvas.current.clientWidth * ratio;
-            context.canvas.height = canvas.current.clientHeight * ratio;
-            centerX.current = context.canvas.width / 2;
-            centerY.current = context.canvas.height / 2;
-            clearContext();
-            drawContext(progress);
-            context.imageSmoothingEnabled = true;
+            if(canvas.current) {
+                context.canvas.width = canvas.current.clientWidth * ratio;
+                context.canvas.height = canvas.current.clientHeight * ratio;
+                centerX.current = context.canvas.width / 2;
+                centerY.current = context.canvas.height / 2;
+                clearContext();
+                drawContext(progress);
+                context.imageSmoothingEnabled = true;
+            }
         }
 
         const clearContext = (paramX, paramY, paramWidth, paramHeight) => {
@@ -161,7 +163,7 @@ export default function Splash({ mount }) {
         const animate = time => {
             if(typeof rafStartTime.current === "undefined") rafStartTime.current = time;
             const progress = time - rafStartTime.current;
-            const calculate = Math.min(((progress + (movieSlateAnimationSpeed.current++)*5) / maxDegree), maxDegree);
+            const calculate = Math.min((progress / maxDegree), maxDegree);
             initCanvas(calculate);
             if(calculate === maxDegree) { // 초기화
                 cancelAnimation();

@@ -7,8 +7,17 @@ export default function CanvasDollLittlePrincess({ craneIsCatch, animationCrane,
     const centerX = useRef(0);
     const centerY = useRef(0);
     const isCaught = useRef(false);
+    const dollArmShakeDegree = useRef(0);
+    const animateDropInterval = useRef();
+    const dollDropY = useRef(-100);
 
     useEffect(() => {
+        const minDistanceY = 100;
+        const maxDollArmShakeDegree = 25;
+        const minDollDropY = -100;
+        const maxDollDropY = 195;
+        const animate = animationCrane();
+        const gameBoxWidth = 300;
         const ratio = 1.5;
 
         const clearContext = (paramX, paramY, paramWidth, paramHeight) => {
@@ -31,31 +40,36 @@ export default function CanvasDollLittlePrincess({ craneIsCatch, animationCrane,
             const bodyRadius = 10;
             const bodyHeight = 30;
 
-            const animate = animationCrane();
             let x = centerX.current;
             let y = centerY.current - bodyRadius - bodyHeight;
             const absX = 5;
-            // 인형 잡힘여부(TODO 음악멈춤, 기타 이벤트)
+            context.save();
+            context.beginPath();
             if(animate.craneDirection === 'stop') {
                 if(isCaught.current) {
                     x = x + animate.craneMoveX;
+                    y = y + dollDropY.current;
+                    if(typeof animateDropInterval.current === 'undefined') {
+                        animateDropInterval.current = setInterval(animateDropDoll, 1);
+                    }
                     handleSetDollIsCaught(true);
                 }
             } else if(animate.craneDirection === 'down') {
                 if(((x + animate.craneMoveX) - absX <= centerX.current && (x + animate.craneMoveX) + absX >= centerX.current)) {
-                    if(animate.craneMoveY === 100) {
+                    if(animate.craneMoveY === minDistanceY) {
                         isCaught.current = true;
                     }
                 }
             }
             if(isCaught.current) {
                 x = x + ((craneIsCatch && (animate.craneDirection === 'up' || animate.craneDirection === 'left')) ? animate.craneMoveX : 0);
-                y = y + ((craneIsCatch && (animate.craneDirection === 'up' || animate.craneDirection === 'left')) ? (animate.craneMoveY - 100) : 0);
+                y = y + ((craneIsCatch && (animate.craneDirection === 'up' || animate.craneDirection === 'left')) ? (animate.craneMoveY - minDistanceY) : 0);
             }
             drawDollHead(x, y, headRadius, hairRadius);
             drawDollBody(x, y, headRadius, hairRadius, neckHeight, bodyRadius, bodyHeight);
             drawDollNeck(x, y, headRadius, neckHeight);
-            // drawClawCraneGameGlass(centerX.current, centerY.current);
+            context.restore();
+            drawClawCraneGameGlass(centerX.current, centerY.current);
         }
 
         const drawDollHead = (centerX, centerY, headRadius, hairRadius) => {
@@ -214,21 +228,21 @@ export default function CanvasDollLittlePrincess({ craneIsCatch, animationCrane,
                     context.restore();
                 }
 
-                const degree = 0; // 0 ~ 45
+                if(isCaught.current && animate.progress) dollArmShakeDegree.current = (animate.progress * 0.05) % maxDollArmShakeDegree;
 
                 context.save();
                 context.beginPath();
                 context.translate(x, y);
-                context.rotate(degree * Math.PI / 180);
-                context.translate(-x - (degree / 20), -y + (degree / 10));
+                context.rotate(dollArmShakeDegree.current * Math.PI / 180);
+                context.translate(-x, -y + (dollArmShakeDegree.current / 10));
                 drawDollCoatArm('right');
                 context.restore();
 
                 context.save();
                 context.beginPath();
                 context.translate(x, y);
-                context.rotate(-degree * Math.PI / 180);
-                context.translate(-x + (degree / 20), -y + (degree / 10));
+                context.rotate(-dollArmShakeDegree.current * Math.PI / 180);
+                context.translate(-x, -y + (dollArmShakeDegree.current / 10));
                 drawDollCoatArm('left');
                 context.restore();
             }
@@ -300,14 +314,35 @@ export default function CanvasDollLittlePrincess({ craneIsCatch, animationCrane,
             context.restore();
         }
 
+        const animateDropDoll = () => {
+            if(dollDropY.current === maxDollDropY) {
+                animateDropDollClear();
+            } else {
+                dollDropY.current++;
+                clearContext();
+                drawContext();
+                clearContext(centerX.current - (gameBoxWidth / 2), centerY.current + 20, gameBoxWidth, 115);
+            }
+        }
+
+        const animateDropDollClear = () => {
+            if(animateDropInterval.current) {
+                clearInterval(animateDropInterval.current);
+                animateDropInterval.current = undefined;
+                dollDropY.current = minDollDropY;
+            }
+        }
+
         const initCanvas = () => {
-            context.canvas.width = canvas.current.clientWidth * ratio;
-            context.canvas.height = canvas.current.clientHeight * ratio;
-            centerX.current = context.canvas.width / 2;
-            centerY.current = context.canvas.height / 2;
-            clearContext();
-            drawContext();
-            context.imageSmoothingEnabled = true;
+            if(canvas.current) {
+                context.canvas.width = canvas.current.clientWidth * ratio;
+                context.canvas.height = canvas.current.clientHeight * ratio;
+                centerX.current = context.canvas.width / 2;
+                centerY.current = context.canvas.height / 2;
+                clearContext();
+                drawContext();
+                context.imageSmoothingEnabled = true;
+            }
         }
 
         // 초기 호출 함수
@@ -324,6 +359,7 @@ export default function CanvasDollLittlePrincess({ craneIsCatch, animationCrane,
 
         return() => {
             window.removeEventListener('resize', initCanvas);
+            animateDropDollClear();
             if(canvas && context) {
                 clearContext();
             }

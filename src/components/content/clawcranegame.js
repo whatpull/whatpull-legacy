@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
+import { navigate } from 'gatsby'
 import * as style from './clawcranegame.module.css'
 import CanvasCrawCrane from '../canvas/canvasclawcrane'
 import CanvasDollLittlePrincess from '../canvas/canvasdolllittleprincess'
@@ -8,6 +9,7 @@ export default function ClawCraneGame() {
     const [craneDirection, setCraneDirection] = useState('down');
     const [craneMoveX, setCraneMoveX] = useState(0);
     const [craneMoveY, setCraneMoveY] = useState(0);
+    const [progress, setProgress] = useState(0);
     const [dollIsCaught, setDollIsCaught] = useState(false);
     const audioMain = useRef();
     const audioCatch = useRef();
@@ -27,14 +29,15 @@ export default function ClawCraneGame() {
             audioStop(audioCatch.current);
         }
     }, []);
-    const handleCrane = useCallback((craneDirection, craneMoveX, craneMoveY) => {
+    const handleCrane = useCallback((craneDirection, craneMoveX, craneMoveY, progress) => {
         setCraneDirection(craneDirection);
         setCraneMoveX(craneMoveX);
         setCraneMoveY(craneMoveY);
+        setProgress(progress);
     }, []);
     const animationCrane = useCallback(() => { 
-        return {craneDirection: craneDirection, craneMoveX: craneMoveX, craneMoveY: craneMoveY}
-    }, [craneDirection, craneMoveX, craneMoveY]);
+        return {craneDirection: craneDirection, craneMoveX: craneMoveX, craneMoveY: craneMoveY, progress: progress}
+    }, [craneDirection, craneMoveX, craneMoveY, progress]);
     const handleSetDollIsCaught = useCallback((isCaught) => {
         setDollIsCaught(isCaught);
     }, []);
@@ -102,6 +105,9 @@ export default function ClawCraneGame() {
                 }
             }
         }
+
+        // 잡을 경우 1초뒤 이동
+        if(dollIsCaught) { setTimeout(() => { navigate('/animation/01'); }, 3000); }
         
         window.addEventListener('keydown', handleKeydown);
         window.addEventListener('keyup', handleKeyUp);
@@ -145,15 +151,15 @@ export default function ClawCraneGame() {
     return (
         <div
             className={style.clawcranegame__canvasWrap}>
-            <CanvasDollLittlePrincess 
-                craneIsCatch={craneIsCatch}
-                animationCrane={animationCrane}
-                handleSetDollIsCaught={handleSetDollIsCaught} />
             <CanvasCrawCrane 
                 handleSetAudioCatchIsPlay={handleSetAudioCatchIsPlay}
                 handleSetAudioCatchIsStop={handleSetAudioCatchIsStop}
                 handleCrane={handleCrane}
                 dollIsCaught={dollIsCaught} />
+            <CanvasDollLittlePrincess 
+                craneIsCatch={craneIsCatch}
+                animationCrane={animationCrane}
+                handleSetDollIsCaught={handleSetDollIsCaught} />
             <div
                 className={style.clawcranegame__keyWrap}>
                 <button
