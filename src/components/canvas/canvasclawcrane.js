@@ -155,7 +155,7 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAu
 
             let craneHandIsOpen = false;
             if(craneDirection.current === 'down' 
-                || craneDirection.current === 'stop') {
+                || (craneDirection.current === 'stop' && craneMoveX.current === craneMinMoveX)) {
                 craneHandIsOpen = true;
             } else {
                 craneHandIsOpen = false;
