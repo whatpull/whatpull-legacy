@@ -465,7 +465,6 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleSetAu
 
         const handleKeyUp = (event) => {
             const stopAnimationJoystick = () => {
-                console.log(dollIsCaught);
                 if(craneMoveY.current === 0 && (craneDirection.current === 'start' || craneDirection.current === 'stop') && dollIsCaught === false) { // 초기상태 체크
                     joystickDirection.current = undefined;
                     joystickAnimationSpeed.current = 1;

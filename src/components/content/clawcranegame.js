@@ -31,13 +31,13 @@ export default function ClawCraneGame() {
         setCraneDirection(craneDirection);
         setCraneMoveX(craneMoveX);
         setCraneMoveY(craneMoveY);
-    }, [])
+    }, []);
     const animationCrane = useCallback(() => { 
         return {craneDirection: craneDirection, craneMoveX: craneMoveX, craneMoveY: craneMoveY}
-    }, [craneDirection, craneMoveX, craneMoveY])
+    }, [craneDirection, craneMoveX, craneMoveY]);
     const handleSetDollIsCaught = useCallback((isCaught) => {
         setDollIsCaught(isCaught);
-    }, [])
+    }, []);
 
     const audioStop = (element) => {
         if(audioContext.current && audioContext.current.state === 'running') {
@@ -75,10 +75,10 @@ export default function ClawCraneGame() {
         const handleKeydown = (event) => {
             if(event.keyCode === 39) { // Right
                 buttonRight.current.classList.add(style.clawcranegame__keyItemActive);
-                audioPlay(audioMain.current);
+                if(!dollIsCaught) audioPlay(audioMain.current);
             } else if(event.keyCode === 37) { // Left
                 buttonLeft.current.classList.add(style.clawcranegame__keyItemActive);
-                audioPlay(audioMain.current);
+                if(!dollIsCaught) audioPlay(audioMain.current);
             }
             if(event.keyCode === 40) { // Down
                 buttonDown.current.classList.add(style.clawcranegame__keyItemActive);
@@ -116,7 +116,7 @@ export default function ClawCraneGame() {
             window.removeEventListener("dragstart", e => e.preventDefault());
             window.removeEventListener("selectstart", e => e.preventDefault());
         }
-    }, [])
+    }, [dollIsCaught])
 
     const handleTouchStartLeft = (event) => {
         window.dispatchEvent(new KeyboardEvent('keydown', {key: 'ArrowLeft', keyCode: 37}));

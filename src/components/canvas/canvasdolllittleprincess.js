@@ -35,7 +35,7 @@ export default function CanvasDollLittlePrincess({ craneIsCatch, animationCrane,
             let x = centerX.current;
             let y = centerY.current - bodyRadius - bodyHeight;
             const absX = 5;
-            // 인형 잡힘여부
+            // 인형 잡힘여부(TODO 음악멈춤, 기타 이벤트)
             if(animate.craneDirection === 'stop') {
                 if(isCaught.current) {
                     x = x + animate.craneMoveX;
