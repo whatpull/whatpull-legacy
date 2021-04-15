@@ -16,6 +16,7 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleCrane
     const craneDirection = useRef('start');
     const craneMoveX = useRef(-80);
     const craneMoveY = useRef(0);
+    const craneArmDegree = useRef(0);
     const centerX = useRef(0);
     const centerY = useRef(0);
     const logoWPImage = useRef();
@@ -161,8 +162,14 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleCrane
 
             CraneBody();
             CraneArm(craneMoveY.current);
+            context.save();
+            context.beginPath();
+            context.translate(x, y);
+            context.rotate(craneArmDegree.current * Math.PI / 180)
+            context.translate(-x, -y);
             CraneHand('right', craneMoveY.current, craneHandIsOpen);
             CraneHand('left', craneMoveY.current, craneHandIsOpen);
+            context.restore();
         }
 
         const drawClawCraneGameControlBox = (centerX, centerY, joystickDegree, downbuttonY) => {
@@ -312,20 +319,20 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleCrane
             context.save();
             context.beginPath();
             context.globalCompositeOperation='source-atop';
-            context.drawImage(logoWPImage.current, centerX + 135, centerY + 200, 30, 30);
+            context.drawImage(logoWPImage.current, centerX + 115, centerY + 200, 30, 30);
             context.restore();
 
             context.save();
             context.beginPath();
             context.globalCompositeOperation='source-atop';
-            context.drawImage(logoPYImage.current, centerX + 100, centerY + 200, 30, 30);
+            context.drawImage(logoPYImage.current, centerX + 80, centerY + 200, 30, 30);
             context.restore();
 
             context.save();
             context.beginPath();
-            context.font = '10px Roboto';
+            context.font = '12px Antonio';
             context.textBaseline = 'middle';
-            context.fillText('Music by ParkYan', centerX + 60, centerY + 250);
+            context.fillText('Music by parkyan', centerX + 60, centerY + 250);
             context.fill();
             context.restore();
         }
@@ -369,20 +376,30 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleCrane
             if(typeof rafStartTime.current === "undefined") rafStartTime.current = time;
             const progress = time - rafStartTime.current;
 
-            const maxDegree = 15;
+            // [조이스틱]
+            const maxJoystickDegree = 15;
             if(joystickDirection.current === 'right') {
-                joystickDegree.current = Math.min(joystickDegree.current + Math.round(progress * 0.1), maxDegree);
+                joystickDegree.current = Math.min(joystickDegree.current + Math.round(progress * 0.1), maxJoystickDegree);
             } else if(joystickDirection.current === 'left') {
-                joystickDegree.current = Math.max(joystickDegree.current - Math.round(progress * 0.1), -maxDegree);
+                joystickDegree.current = Math.max(joystickDegree.current - Math.round(progress * 0.1), -maxJoystickDegree);
             }
             drawClawCraneGameControlBox(centerX.current, centerY.current, joystickDegree.current, 0);
 
+            // [크레인팔]
             if(joystickDirection.current === 'right') {
                 craneMoveX.current = Math.min(craneMoveX.current + Math.round(progress * 0.01), craneMaxMoveX);
             } else if(joystickDirection.current === 'left') {
                 craneMoveX.current = Math.max(craneMoveX.current - Math.round(progress * 0.01), craneMinMoveX);
             }
             drawClawCraneGameGlass(centerX.current, centerY.current);
+
+            // [크레인손]
+            const maxCraneArmDegree = 5;
+            if(joystickDirection.current === 'right') {
+                craneArmDegree.current = Math.min(craneArmDegree.current + Math.round(progress * 0.01), maxCraneArmDegree);
+            } else if(joystickDirection.current === 'left') {
+                craneArmDegree.current = Math.max(craneArmDegree.current - Math.round(progress * 0.01), -maxCraneArmDegree);
+            }
 
             startAnimation(animateJoystick);
         }
@@ -399,13 +416,13 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleCrane
                 handleSetAudioCatchIsPlay(true);
                 cancelAnimationFrame(raf.current);
                 craneDirection.current = 'down';
-                startAnimation(animateCrane);
+                startAnimation(animateCraneCatch);
             } else {
                 startAnimation(animateDownbutton);
             }
         }
 
-        const animateCrane = time => {
+        const animateCraneCatch = time => {
             if(typeof rafStartTime.current === 'undefined') rafStartTime.current = time;
             const progress = time - rafStartTime.current;
 
@@ -440,7 +457,7 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleCrane
                 cancelAnimation();
                 handleCrane(craneDirection.current, craneMoveX.current, craneMoveY.current);
             } else {
-                startAnimation(animateCrane);
+                startAnimation(animateCraneCatch);
             }
         }
 
@@ -497,8 +514,10 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleCrane
                     joystickDirection.current = undefined;
                     joystickAnimationSpeed.current = 1;
                     joystickDegree.current = 0;
+                    craneArmDegree.current = 0;
                     cancelAnimation();
                     drawClawCraneGameControlBox(centerX.current, centerY.current, 0, 0);
+                    drawClawCraneGameGlass(centerX.current, centerY.current);
                 }
             }
             if(event.keyCode === 39) { // Right

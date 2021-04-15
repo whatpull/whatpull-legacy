@@ -52,6 +52,7 @@ module.exports = {
         fonts: [
           'material icons',
           'roboto:300,400,500,700',
+          'antonio:300,400,500,700'
         ],
       },
     },

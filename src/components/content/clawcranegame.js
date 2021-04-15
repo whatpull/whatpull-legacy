@@ -48,8 +48,10 @@ export default function ClawCraneGame() {
     const audioMainStop = useCallback(() => {
         if(audioMainContext.current && audioMainContext.current.state === 'running') {
             audioMainContext.current.suspend().then(() => {
-                audioMain.current.pause();
-                audioMain.current.currentTime = 0;
+                if(audioMain.current) {
+                    audioMain.current.pause();
+                    audioMain.current.currentTime = 0;
+                }
             });
         }
     }, []);
@@ -80,8 +82,10 @@ export default function ClawCraneGame() {
     const audioCatchStop = useCallback(() => {
         if(audioCatchContext.current && audioCatchContext.current.state === 'running') {
             audioCatchContext.current.suspend().then(() => {
-                audioCatch.current.pause();
-                audioCatch.current.currentTime = 0;
+                if(audioCatch.current) {
+                    audioCatch.current.pause();
+                    audioCatch.current.currentTime = 0;
+                }
             });
         }
     }, []);
@@ -112,8 +116,10 @@ export default function ClawCraneGame() {
     const audioSuccessStop = useCallback(() => {
         if(audioSuccessContext.current && audioSuccessContext.current.state === 'running') {
             audioSuccessContext.current.suspend().then(() => {
-                audioSuccess.current.pause();
-                audioSuccess.current.currentTime = 0;
+                if(audioSuccess.current) {
+                    audioSuccess.current.pause();
+                    audioSuccess.current.currentTime = 0;
+                }
             });
         }
     }, []);
