@@ -33,7 +33,7 @@ export default function CanvasAnimation01() {
                 clearContext();
             }
         }
-    }, [])
+    }, [context])
 
     return (
         <canvas
