@@ -43,9 +43,9 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleCrane
             context.fillStyle = '#FFFFFF';
 
             drawClawCraneGameBody(centerX.current, centerY.current);
-            drawClawCraneGameLogo(centerX.current, centerY.current);
             drawClawCraneGameHead(centerX.current, centerY.current);
             drawClawCraneGameFoot(centerX.current, centerY.current);
+            drawClawCraneGameLogo(centerX.current, centerY.current);
         }
 
         const drawClawCraneGameHead = (centerX, centerY) => {
@@ -92,8 +92,6 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleCrane
 
             drawRoundedRectangle(x, y, width, height, radius, type, '#ABCDED', 1); // 유리 뒷면
             drawClawCraneGameCrane(centerX, y); // -80 ~ 80 사이의 거리
-            // drawRoundedRectangle(x, y, width, height, radius, type, 'rgba(246, 254, 255, 0.5)', 1); // 유리 앞면
-            // drawRoundedRectangle(x - 1, y + height - 10, width + 2, 10, radius, type, '#008080', 1); // 유리 하단(유리 거치대)
         }
 
         const drawClawCraneGameCrane = (centerX, centerY) => {
@@ -314,20 +312,20 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleCrane
             context.save();
             context.beginPath();
             context.globalCompositeOperation='source-atop';
-            context.drawImage(logoWPImage.current, centerX + 97, centerY + 160, 40, 40);
+            context.drawImage(logoWPImage.current, centerX + 135, centerY + 200, 30, 30);
             context.restore();
 
             context.save();
             context.beginPath();
             context.globalCompositeOperation='source-atop';
-            context.drawImage(logoPYImage.current, centerX + 52, centerY + 160, 40, 40);
+            context.drawImage(logoPYImage.current, centerX + 100, centerY + 200, 30, 30);
             context.restore();
 
             context.save();
             context.beginPath();
-            context.font = '9px Roboto';
+            context.font = '10px Roboto';
             context.textBaseline = 'middle';
-            context.fillText('Music by ParkYan', centerX + 60, centerY + 210);
+            context.fillText('Music by ParkYan', centerX + 60, centerY + 250);
             context.fill();
             context.restore();
         }
