@@ -21,29 +21,6 @@ export default function ClawCraneGame() {
     const buttonDown = useRef();
     const buttonRight = useRef();
 
-    // [useCallback : 함수 재사용(리렌더링에 영향없이 함수를 일회만 생성)]
-    const handleSetAudioCatchIsPlay = useCallback((isPlay) => {
-        if(isPlay) { 
-            audioCatchPlay();
-            setCraneIsCatch(true);
-        } else {
-            audioCatchStop();
-            setCraneIsCatch(false);
-        }
-    }, []);
-    const handleCrane = useCallback((craneDirection, craneMoveX, craneMoveY, progress) => {
-        setCraneDirection(craneDirection);
-        setCraneMoveX(craneMoveX);
-        setCraneMoveY(craneMoveY);
-        setProgress(progress);
-    }, []);
-    const handleSetDollIsCaught = useCallback((isCaught) => {
-        setDollIsCaught(isCaught);
-    }, []);
-    const animationCrane = useCallback(() => { 
-        return {craneDirection: craneDirection, craneMoveX: craneMoveX, craneMoveY: craneMoveY, progress: progress}
-    }, [craneDirection, craneMoveX, craneMoveY, progress]);
-
     // [오디오 : 메인]
     const audioMainPlay = useCallback(() => {
         if(typeof audioMainContext.current === 'undefined') {
@@ -141,6 +118,30 @@ export default function ClawCraneGame() {
         }
     }, []);
 
+
+    // [useCallback : 함수 재사용(리렌더링에 영향없이 함수를 일회만 생성)]
+    const handleCrane = useCallback((craneDirection, craneMoveX, craneMoveY, progress) => {
+        setCraneDirection(craneDirection);
+        setCraneMoveX(craneMoveX);
+        setCraneMoveY(craneMoveY);
+        setProgress(progress);
+    }, []);
+    const handleSetDollIsCaught = useCallback((isCaught) => {
+        setDollIsCaught(isCaught);
+    }, []);
+    const animationCrane = useCallback(() => { 
+        return {craneDirection: craneDirection, craneMoveX: craneMoveX, craneMoveY: craneMoveY, progress: progress}
+    }, [craneDirection, craneMoveX, craneMoveY, progress]);
+    const handleSetAudioCatchIsPlay = useCallback((isPlay) => {
+        if(isPlay) { 
+            audioCatchPlay();
+            setCraneIsCatch(true);
+        } else {
+            audioCatchStop();
+            setCraneIsCatch(false);
+        }
+    }, [audioCatchPlay, audioCatchStop]);
+
     useEffect(() => {
         const handleKeydown = (event) => {
             if(event.keyCode === 39) { // Right
@@ -205,7 +206,7 @@ export default function ClawCraneGame() {
             window.removeEventListener("dragstart", e => e.preventDefault());
             window.removeEventListener("selectstart", e => e.preventDefault());
         }
-    }, [dollIsCaught])
+    }, [dollIsCaught, audioMainPlay, audioMainStop, audioCatchPlay, audioCatchStop, audioSuccessPlay, audioSuccessStop])
 
     const handleTouchStartLeft = (event) => {
         window.dispatchEvent(new KeyboardEvent('keydown', {key: 'ArrowLeft', keyCode: 37}));
