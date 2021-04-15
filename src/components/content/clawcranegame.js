@@ -29,6 +29,7 @@ export default function ClawCraneGame() {
             const source = audioMainContext.current.createMediaElementSource(audioMain.current);
             const gain = audioMainContext.current.createGain();
             source.connect(gain).connect(destination);
+            source.loop = true;
             audioMainContext.current.suspend();
         }
 
@@ -64,6 +65,7 @@ export default function ClawCraneGame() {
             const source = audioCatchContext.current.createMediaElementSource(audioCatch.current);
             const gain = audioCatchContext.current.createGain();
             source.connect(gain).connect(destination);
+            source.loop = true;
             audioCatchContext.current.suspend();
         }
         if(audioCatchContext.current && audioCatchContext.current.state === 'suspended') {
