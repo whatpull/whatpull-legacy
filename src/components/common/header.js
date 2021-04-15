@@ -71,21 +71,23 @@ export default function Header() {
             patternImage.current.src = '/pattern_v1.jpeg';
         }
 
-        // 초기 호출 함수
-        if(canvas) {
-            if(typeof context === 'undefined') {
-                setContext(canvas.current.getContext('2d'));
-            }
-            if(context) {
-                loadImage(() => {
-                    cancelAnimation();
-                    clearContext();
-                    drawContext(0, 25);
-                    startAnimation();
-                });
+        const initialize = () => {
+            if(canvas) {
+                if(typeof context === 'undefined') {
+                    setContext(canvas.current.getContext('2d'));
+                }
+                if(context) {
+                    loadImage(() => {
+                        cancelAnimation();
+                        clearContext();
+                        drawContext(0, 25);
+                        startAnimation();
+                    });
+                }
             }
         }
 
+        initialize();
         return() => {
             if(canvas && context) {
                 cancelAnimation();

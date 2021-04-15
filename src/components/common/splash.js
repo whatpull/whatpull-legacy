@@ -195,32 +195,34 @@ export default function Splash({ mount }) {
             patternSlateBottomImage.current.src = '/pattern_slate_bottom.png';
         }
 
-        // 초기 호출 함수
-        if(canvas) {
-            if(typeof context === "undefined") {
-                setContext(canvas.current.getContext("2d"));
+        const initialize = () => {
+            if(canvas) {
+                if(typeof context === "undefined") {
+                    setContext(canvas.current.getContext("2d"));
+                }
+                if(context) {
+                    loadImage(() => {
+                        cancelAnimation();
+                        clearContext();
+                        initCanvas(maxDegree);
+                        startAnimation();
+                        window.addEventListener('resize', initCanvas);
+                    });
+                }
             }
-            if(context) {
-                loadImage(() => {
-                    cancelAnimation();
-                    clearContext();
-                    initCanvas(maxDegree);
-                    startAnimation();
-                    window.addEventListener('resize', initCanvas);
-                });
+
+            // gatsby-plugin-transition-link:TransitionState에 mount 값을 측정하여, 스플래쉬의 display를 none으로 적용한다.
+            // opacity만 0으로 변경될 경우 문제가 발생한다.[방향키 버튼이 작동하지 않는다.]
+            if(mount) {
+                if(typeof displayNone.current === 'undefined') {
+                    displayNone.current = setTimeout(() => {
+                        if(wrap.current) wrap.current.style.display = 'none';
+                    }, 2100); // 시간(2100)은 애니메이션의 시간과 최적화 되어있습니다.
+                }
             }
         }
 
-        // mount를 측정하여, 스플래쉬의 display를 none으로 적용한다.
-        // opacity만 0으로 변경될 경우 문제가 발생한다.
-        if(mount) {
-            if(typeof displayNone.current === 'undefined') {
-                displayNone.current = setTimeout(() => {
-                    wrap.current.style.display = 'none';
-                }, 2100);
-            }
-        }
-
+        initialize();
         return() => {
             window.removeEventListener('resize', initCanvas);
             if(canvas && context) {

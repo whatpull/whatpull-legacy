@@ -345,18 +345,20 @@ export default function CanvasDollLittlePrincess({ craneIsCatch, animationCrane,
             }
         }
 
-        // 초기 호출 함수
-        if(canvas) {
-            if(typeof context === "undefined") {
-                setContext(canvas.current.getContext("2d"));
-            }
-            if(context) {
-                clearContext();
-                initCanvas();
-                window.addEventListener('resize', initCanvas);
+        const initialize = () => {
+            if(canvas) {
+                if(typeof context === "undefined") {
+                    setContext(canvas.current.getContext("2d"));
+                }
+                if(context) {
+                    clearContext();
+                    initCanvas();
+                    window.addEventListener('resize', initCanvas);
+                }
             }
         }
 
+        initialize();
         return() => {
             window.removeEventListener('resize', initCanvas);
             animateDropDollClear();

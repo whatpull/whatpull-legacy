@@ -533,26 +533,28 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleCrane
             }
             loadLogoWPImage(() => { loadLogoPYImage(callback); });
         }
-        
-        // 초기 호출 함수
-        if(canvas) {
-            if(typeof context === "undefined") {
-                setContext(canvas.current.getContext("2d"));
-            }
-            if(context) {
-                loadImage(() => {
-                    clearContext();
-                    initCanvas();
-                    window.addEventListener('resize', initCanvas);
-                    window.addEventListener('keydown', handleKeydown);
-                    window.addEventListener('keyup', handleKeyUp);
-                    window.addEventListener('contextmenu', e => e.preventDefault());
-                    window.addEventListener('dragstart', e => e.preventDefault());
-                    window.addEventListener('selectstart', e => e.preventDefault());
-                })
+
+        const initialize = () => {
+            if(canvas) {
+                if(typeof context === "undefined") {
+                    setContext(canvas.current.getContext("2d"));
+                }
+                if(context) {
+                    loadImage(() => {
+                        clearContext();
+                        initCanvas();
+                        window.addEventListener('resize', initCanvas);
+                        window.addEventListener('keydown', handleKeydown);
+                        window.addEventListener('keyup', handleKeyUp);
+                        window.addEventListener('contextmenu', e => e.preventDefault());
+                        window.addEventListener('dragstart', e => e.preventDefault());
+                        window.addEventListener('selectstart', e => e.preventDefault());
+                    })
+                }
             }
         }
 
+        initialize();
         return() => {
             window.removeEventListener('resize', initCanvas);
             window.removeEventListener('keydown', handleKeydown);
