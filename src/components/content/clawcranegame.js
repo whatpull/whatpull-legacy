@@ -129,9 +129,6 @@ export default function ClawCraneGame() {
     const handleSetDollIsCaught = useCallback((isCaught) => {
         setDollIsCaught(isCaught);
     }, []);
-    const animationCrane = useCallback(() => { 
-        return {craneDirection: craneDirection, craneMoveX: craneMoveX, craneMoveY: craneMoveY, progress: progress}
-    }, [craneDirection, craneMoveX, craneMoveY, progress]);
     const handleSetAudioCatchIsPlay = useCallback((isPlay) => {
         if(isPlay) { 
             audioCatchPlay();
@@ -141,6 +138,9 @@ export default function ClawCraneGame() {
             setCraneIsCatch(false);
         }
     }, [audioCatchPlay, audioCatchStop]);
+    const animationCrane = useCallback(() => { 
+        return {craneDirection: craneDirection, craneMoveX: craneMoveX, craneMoveY: craneMoveY, progress: progress}
+    }, [craneDirection, craneMoveX, craneMoveY, progress]);
 
     useEffect(() => {
         const handleKeydown = (event) => {
@@ -182,16 +182,19 @@ export default function ClawCraneGame() {
             audioSuccessStop();
         }
 
-        // 잡을 경우 3초뒤 이동
-        if(dollIsCaught) {
-            audioCatchStop();
-            audioSuccessPlay();
-            setTimeout(() => { 
-                audioAllStop();
-                navigate('/animation/01'); 
-            }, 3000); 
+        // [초기화 : 인형을 뽑았을 경우(Success)]
+        const initDollIsCaught = () => {
+            if(dollIsCaught) { // 인형이 잡혔을 경우
+                audioCatchStop();
+                audioSuccessPlay();
+                setTimeout(() => { 
+                    audioAllStop();
+                    navigate('/animation/01'); 
+                }, 3000); 
+            }
         }
-        
+
+        initDollIsCaught();
         window.addEventListener('keydown', handleKeydown);
         window.addEventListener('keyup', handleKeyUp);
         window.addEventListener("contextmenu", e => e.preventDefault());
@@ -208,26 +211,22 @@ export default function ClawCraneGame() {
         }
     }, [dollIsCaught, audioMainPlay, audioMainStop, audioCatchPlay, audioCatchStop, audioSuccessPlay, audioSuccessStop])
 
+    // [이벤트 : 핸들러]
     const handleTouchStartLeft = (event) => {
         window.dispatchEvent(new KeyboardEvent('keydown', {key: 'ArrowLeft', keyCode: 37}));
     }
-
     const handleTouchEndLeft = (event) => {
         window.dispatchEvent(new KeyboardEvent('keyup', {key: 'ArrowLeft', keyCode: 37}));
     }
-
     const handleTouchStartRight = (event) => {
         window.dispatchEvent(new KeyboardEvent('keydown', {key: 'ArrowRight', keyCode: 39}));
     }
-
     const handleTouchEndRight = (event) => {
         window.dispatchEvent(new KeyboardEvent('keyup', {key: 'ArrowRight', keyCode: 39}));
     }
-
     const handleTouchStartDown = (event) => {
         window.dispatchEvent(new KeyboardEvent('keydown', {key: 'ArrowDown', keyCode: 40}));
     }
-
     const handleTouchEndDown = (event) => {
         window.dispatchEvent(new KeyboardEvent('keyup', {key: 'ArrowDown', keyCode: 40}));
     }
