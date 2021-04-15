@@ -43,13 +43,90 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleCrane
             context.strokeStyle = '#FFFFFF';
             context.fillStyle = '#FFFFFF';
 
-            drawClawCraneGameBody(centerX.current, centerY.current);
             drawClawCraneGameHead(centerX.current, centerY.current);
+            drawClawCraneGameBody(centerX.current, centerY.current);
             drawClawCraneGameFoot(centerX.current, centerY.current);
             drawClawCraneGameLogo(centerX.current, centerY.current);
         }
 
         const drawClawCraneGameHead = (centerX, centerY) => {
+            const width = 300;
+            const height = 40;
+            const distance = 40;
+            const x = centerX - (width / 2);
+            const y = centerY - (246 + height);
+
+            context.save();
+            context.beginPath();
+            context.moveTo(x + distance, y);
+            context.lineTo(x + width - distance, y);
+            context.lineTo(x + width, y + height);
+            context.lineTo(x, y + height);
+            context.closePath();
+            context.fillStyle = '#00796B';
+            context.fill();
+            context.restore();
+
+            const drawClawCraneGameHeadGlass = (fillColor) => {
+                const glassWidth = 260;
+                const glassHeight = 25;
+                const glassDistance = glassHeight;
+                const glassX = centerX - (glassWidth / 2);
+                const glassY = centerY - (246 + glassHeight);
+
+                context.save();
+                context.beginPath();
+                context.moveTo(glassX + glassDistance, glassY);
+                context.lineTo(glassX + glassWidth - glassDistance, glassY);
+                context.lineTo(glassX + glassWidth, glassY + glassHeight);
+                context.lineTo(glassX, glassY + glassHeight);
+                context.closePath();
+                context.fillStyle = fillColor;
+                context.fill();
+                context.restore();
+            }
+            drawClawCraneGameHeadGlass('#ABCDED');
+
+            const drawClawCraneGameHeadGraneLine = () => {
+                const glassWidth = 260;
+                const glassHeight = 15;
+                const glassDistance = glassHeight;
+                const glassX = centerX - (glassWidth / 2);
+                const glassY = centerY - (246 + glassHeight);
+
+                context.save();
+                context.beginPath();
+                context.moveTo(glassX + glassDistance, glassY);
+                context.lineTo(glassX + glassWidth - glassDistance, glassY);
+                context.lineTo(glassX + glassWidth, glassY + glassHeight);
+                context.lineTo(glassX, glassY + glassHeight);
+                context.closePath();
+                context.fillStyle = '#121212';
+                context.fill();
+                context.restore();
+            }
+            drawClawCraneGameHeadGraneLine();
+            drawClawCraneGameHeadGlass('rgba(246, 254, 255, 0.5)');
+        }
+
+        const drawClawCraneGameBody = (centerX, centerY) => {
+            const width = 300;
+            const height = 500;
+            const x = centerX - (width / 2);
+            const y = centerY - (height / 2);
+            const radius = 6;
+            const type = 'fill';
+
+            drawRoundedRectangle(x + 5, y + 5, width, height, radius, type, '#121212', 0.1);
+            drawRoundedRectangle(x, y, width, height, radius, type, '#009688', 1);
+
+            drawClawCraneGameCeiling(centerX, centerY);
+            drawClawCraneGameGlass(centerX, centerY);
+            drawClawCraneGameControlBox(centerX, centerY, 0, 0);
+            drawClawCraneGameExitBox(centerX, centerY);
+        }
+
+        const drawClawCraneGameCeiling = (centerX, centerY) => {
             const width = 240;
             const height = 10;
             const x = centerX - (width / 2);
@@ -65,22 +142,6 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleCrane
             context.fillStyle = '#56B2AA';
             context.fill();
             context.restore();
-        }
-
-        const drawClawCraneGameBody = (centerX, centerY) => {
-            const width = 300;
-            const height = 500;
-            const x = centerX - (width / 2);
-            const y = centerY - (height / 2);
-            const radius = 6;
-            const type = 'fill';
-
-            drawRoundedRectangle(x+3, y+3, width, height, radius, type, '#121212', 0.5);
-            drawRoundedRectangle(x, y, width, height, radius, type, '#009688', 1);
-
-            drawClawCraneGameGlass(centerX, centerY);
-            drawClawCraneGameControlBox(centerX, centerY, 0, 0);
-            drawClawCraneGameExitBox(centerX, centerY);
         }
 
         const drawClawCraneGameGlass = (centerX, centerY) => {
@@ -319,32 +380,32 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleCrane
             context.save();
             context.beginPath();
             context.globalCompositeOperation='source-atop';
-            context.drawImage(logoWPImage.current, centerX + 115, centerY + 200, 30, 30);
+            context.drawImage(logoWPImage.current, centerX + 105, centerY + 185, 30, 30);
             context.restore();
 
             context.save();
             context.beginPath();
             context.globalCompositeOperation='source-atop';
-            context.drawImage(logoPYImage.current, centerX + 80, centerY + 200, 30, 30);
+            context.drawImage(logoPYImage.current, centerX + 70, centerY + 185, 30, 30);
             context.restore();
 
             context.save();
             context.beginPath();
-            context.font = '12px Antonio';
+            context.font = '12px Robot';
             context.textBaseline = 'middle';
-            context.fillText('Music by parkyan', centerX + 60, centerY + 250);
+            context.fillText('Music by parkyan', centerX + 45, centerY + 240);
             context.fill();
             context.restore();
         }
 
         const drawClawCraneGameFoot = (centerX, centerY) => {
-            const width = 310;
+            const width = 300;
             const height = 25;
             const x = centerX - (width / 2);
-            const y = centerY - (height / 2) + 250;
+            const y = centerY - (height / 2) + 240;
             const radius = 2;
             const type = 'fill';
-            drawRoundedRectangle(x+1, y-2, width-2, height, radius, type, '#121212', 0.5);
+            drawRoundedRectangle(x+1, y-2, width-2, height, radius, type, '#121212', 0.1);
             drawRoundedRectangle(x, y, width, height, radius, type, '#121212', 1);
         }
 
