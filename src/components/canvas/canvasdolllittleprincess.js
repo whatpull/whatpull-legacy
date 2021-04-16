@@ -1,7 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import * as style from './canvasdolllittleprincess.module.css';
 
-export default function CanvasDollLittlePrincess({ craneIsCatch, animationCrane, handleSetDollIsCaught }) {
+export default function CanvasDollLittlePrincess({ craneIsCatch, 
+                                                    animationCrane, 
+                                                    handleSetDollIsCaught,
+                                                    craneMaxMoveY,
+                                                    ratio }) {
     const [context, setContext] = useState();
     const canvas = useRef();
     const centerX = useRef(0);
@@ -12,13 +16,12 @@ export default function CanvasDollLittlePrincess({ craneIsCatch, animationCrane,
     const dollDropY = useRef(-100);
 
     useEffect(() => {
-        const minDistanceY = 100;
+        const minDistanceY = craneMaxMoveY;
         const maxDollArmShakeDegree = 25;
         const minDollDropY = -100;
         const maxDollDropY = 195;
         const animate = animationCrane();
         const gameBoxWidth = 300;
-        const ratio = 1.5;
 
         const clearContext = (paramX, paramY, paramWidth, paramHeight) => {
             if(canvas.current) {
@@ -366,7 +369,12 @@ export default function CanvasDollLittlePrincess({ craneIsCatch, animationCrane,
                 clearContext();
             }
         }
-    }, [context, craneIsCatch, animationCrane, handleSetDollIsCaught])
+    }, [context, 
+        craneIsCatch, 
+        animationCrane, 
+        handleSetDollIsCaught,
+        craneMaxMoveY,
+        ratio])
 
     return (
         <canvas

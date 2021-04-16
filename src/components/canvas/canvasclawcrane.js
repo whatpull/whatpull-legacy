@@ -3,7 +3,14 @@ import * as style from './canvasclawcrane.module.css';
 import icon_wp from '../../images/icon_small.png';
 import icon_py from '../../images/icon_py_small.png';
 
-export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleCrane, dollIsCaught }) {
+export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, 
+                                            handleCrane, 
+                                            dollIsCaught, 
+                                            craneMinMoveX,
+                                            craneMaxMoveX,
+                                            craneMinMoveY,
+                                            craneMaxMoveY,
+                                            ratio }) {
     const [context, setContext] = useState();
     const canvas = useRef();
     const raf = useRef();
@@ -23,12 +30,6 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleCrane
     const logoPYImage = useRef();
 
     useEffect(() => {
-        const craneMinMoveX = -80;
-        const craneMaxMoveX = 80;
-        const craneMinMoveY = 0;
-        const craneMaxMoveY = 100;
-        const ratio = 1.5;
-
         const clearContext = (paramX, paramY, paramWidth, paramHeight) => {
             if(canvas.current) {
                 const x = paramX ? paramX : 0;
@@ -50,23 +51,24 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleCrane
         }
 
         const drawClawCraneGameHead = (centerX, centerY) => {
-            const width = 300;
-            const height = 40;
-            const distance = 40;
-            const x = centerX - (width / 2);
-            const y = centerY - (246 + height);
-
-            context.save();
-            context.beginPath();
-            context.moveTo(x + distance, y);
-            context.lineTo(x + width - distance, y);
-            context.lineTo(x + width, y + height);
-            context.lineTo(x, y + height);
-            context.closePath();
-            context.fillStyle = '#00796B';
-            context.fill();
-            context.restore();
-
+            const drawClawCraneGameHeadBody = () => {
+                const width = 300;
+                const height = 40;
+                const distance = 40;
+                const x = centerX - (width / 2);
+                const y = centerY - (246 + height);
+    
+                context.save();
+                context.beginPath();
+                context.moveTo(x + distance, y);
+                context.lineTo(x + width - distance, y);
+                context.lineTo(x + width, y + height);
+                context.lineTo(x, y + height);
+                context.closePath();
+                context.fillStyle = '#00796B';
+                context.fill();
+                context.restore();
+            }
             const drawClawCraneGameHeadGlass = (fillColor) => {
                 const glassWidth = 260;
                 const glassHeight = 25;
@@ -85,27 +87,28 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleCrane
                 context.fill();
                 context.restore();
             }
-            drawClawCraneGameHeadGlass('#ABCDED');
-
-            const drawClawCraneGameHeadGraneLine = () => {
-                const glassWidth = 260;
-                const glassHeight = 15;
-                const glassDistance = glassHeight;
-                const glassX = centerX - (glassWidth / 2);
-                const glassY = centerY - (246 + glassHeight);
+            const drawClawCraneGameHeadCraneLine = () => {
+                const lineWidth = 250 + 2;
+                const lineHeight = 5;
+                const lineDistance = lineHeight;
+                const lineX = centerX - (lineWidth / 2);
+                const lineY = centerY - (250 + lineHeight);
 
                 context.save();
                 context.beginPath();
-                context.moveTo(glassX + glassDistance, glassY);
-                context.lineTo(glassX + glassWidth - glassDistance, glassY);
-                context.lineTo(glassX + glassWidth, glassY + glassHeight);
-                context.lineTo(glassX, glassY + glassHeight);
+                context.moveTo(lineX + lineDistance, lineY);
+                context.lineTo(lineX + lineWidth - lineDistance, lineY);
+                context.lineTo(lineX + lineWidth, lineY + lineHeight);
+                context.lineTo(lineX, lineY + lineHeight);
                 context.closePath();
                 context.fillStyle = '#121212';
                 context.fill();
                 context.restore();
             }
-            drawClawCraneGameHeadGraneLine();
+
+            drawClawCraneGameHeadBody();
+            drawClawCraneGameHeadGlass('#ABCDED');
+            drawClawCraneGameHeadCraneLine();
             drawClawCraneGameHeadGlass('rgba(246, 254, 255, 0.5)');
         }
 
@@ -159,10 +162,10 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleCrane
         const drawClawCraneGameCrane = (centerX, centerY) => {
             const x = centerX + craneMoveX.current;
             const y = centerY;
-
+            const craneHandIsOpen = craneDirection.current === 'down' || (craneDirection.current === 'stop' && craneMoveX.current === craneMinMoveX);
             const CraneBody = () => {
                 const radius = 10;
-                
+
                 context.save();
                 context.beginPath();
                 context.arc(x, y, radius + 3, Math.PI * 1, Math.PI * 2, true);
@@ -170,7 +173,6 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleCrane
                 context.fill();
                 context.restore();
             }
-
             const CraneArm = (increaseHeight) => {
                 const calcX = x - 5;
                 const calcY = y + 10;
@@ -185,7 +187,6 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleCrane
                 drawRoundedRectangle(calcX + 2, calcY, width - 4, height + 10 + increaseHeight, radius, type, '#121212', 1); // 증가선
                 context.restore();
             }
-
             const CraneHand = (direction, increaseHeight, craneHandIsOpen) => {
                 const radius = 30;
                 const degree = 45;
@@ -211,14 +212,6 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleCrane
                 context.fill();
 
                 context.restore();
-            }
-
-            let craneHandIsOpen = false;
-            if(craneDirection.current === 'down' 
-                || (craneDirection.current === 'stop' && craneMoveX.current === craneMinMoveX)) {
-                craneHandIsOpen = true;
-            } else {
-                craneHandIsOpen = false;
             }
 
             CraneBody();
@@ -361,7 +354,6 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleCrane
                 drawRoundedRectangle(x + 3, y + 3, width, height, radius, type, 'rgba(0, 0, 0, 0.1)', 1); // 출구 그림자
                 drawRoundedRectangle(x, y, width, height, radius, type, 'rgba(246, 254, 255, 0.7)', 1); // 출구 유리    
             }
-            
             const exitBoxHandle = () => {
                 const width = 80;
                 const height = 6;
@@ -369,7 +361,7 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleCrane
                 const y = centerY - (height / 2) + 130;
                 const radius = 2;
                 const type = 'fill';
-                drawRoundedRectangle(x, y, width, height, radius, type, '#121212', 1);
+                drawRoundedRectangle(x, y, width, height, radius, type, '#121212', 0.7);
             }
             
             exitBoxBody();
@@ -377,25 +369,33 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleCrane
         }
 
         const drawClawCraneGameLogo = (centerX, centerY) => {
-            context.save();
-            context.beginPath();
-            context.globalCompositeOperation='source-atop';
-            context.drawImage(logoWPImage.current, centerX + 105, centerY + 185, 30, 30);
-            context.restore();
+            const drawWhatpullLogoImage = () => {
+                context.save();
+                context.beginPath();
+                context.globalCompositeOperation='source-atop';
+                context.drawImage(logoWPImage.current, centerX + 105, centerY + 185, 30, 30);
+                context.restore();
+            }
+            const drawParyarnLogoImage = () => {
+                context.save();
+                context.beginPath();
+                context.globalCompositeOperation='source-atop';
+                context.drawImage(logoPYImage.current, centerX + 70, centerY + 185, 30, 30);
+                context.restore();
+            }
+            const drawParyarnLogoText = () => {
+                context.save();
+                context.beginPath();
+                context.font = '12px Robot';
+                context.textBaseline = 'middle';
+                context.fillText('Music by parkyan', centerX + 45, centerY + 240);
+                context.fill();
+                context.restore();
+            }
 
-            context.save();
-            context.beginPath();
-            context.globalCompositeOperation='source-atop';
-            context.drawImage(logoPYImage.current, centerX + 70, centerY + 185, 30, 30);
-            context.restore();
-
-            context.save();
-            context.beginPath();
-            context.font = '12px Robot';
-            context.textBaseline = 'middle';
-            context.fillText('Music by parkyan', centerX + 45, centerY + 240);
-            context.fill();
-            context.restore();
+            drawWhatpullLogoImage();
+            drawParyarnLogoImage();
+            drawParyarnLogoText();
         }
 
         const drawClawCraneGameFoot = (centerX, centerY) => {
@@ -498,7 +498,7 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleCrane
             drawClawCraneGameGlass(centerX.current, centerY.current);
             handleCrane(craneDirection.current, craneMoveX.current, craneMoveY.current, progress);
 
-            // 방향 설정
+            // 크레인 이동 방향 설정
             if(craneMoveY.current === craneMaxMoveY) {
                 craneDirection.current = 'up';
             } else if(craneMoveY.current === craneMinMoveY) {
@@ -546,14 +546,14 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleCrane
 
         const handleKeydown = (event) => {
             const playAnimationJoystick = (direction) => {
-                if(craneMoveY.current === 0 && (craneDirection.current === 'start' || craneDirection.current === 'stop') && dollIsCaught === false) { // 초기상태 체크
+                if(craneMoveY.current === 0 && (craneDirection.current === 'start' || craneDirection.current === 'stop') && !dollIsCaught) { // 초기상태 체크
                     cancelAnimationFrame(raf.current);
                     joystickDirection.current = direction;
                     startAnimation(animateJoystick);
                 }
             }
             const playAnimationDownbutton = (direction) => {
-                if(craneMoveY.current === 0 && (craneDirection.current === 'start' || craneDirection.current === 'stop') && dollIsCaught === false) { // 초기상태 체크
+                if(craneMoveY.current === 0 && (craneDirection.current === 'start' || craneDirection.current === 'stop') && !dollIsCaught) { // 초기상태 체크
                     cancelAnimationFrame(raf.current);
                     downbuttonDirection.current = direction;
                     startAnimation(animateDownbutton);
@@ -571,7 +571,7 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleCrane
 
         const handleKeyUp = (event) => {
             const stopAnimationJoystick = () => {
-                if(craneMoveY.current === 0 && (craneDirection.current === 'start' || craneDirection.current === 'stop') && dollIsCaught === false) { // 초기상태 체크
+                if(craneMoveY.current === 0 && (craneDirection.current === 'start' || craneDirection.current === 'stop') && !dollIsCaught) { // 초기상태 체크
                     joystickDirection.current = undefined;
                     joystickAnimationSpeed.current = 1;
                     joystickDegree.current = 0;
@@ -647,7 +647,15 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay, handleCrane
                 clearContext();
             }
         }
-    }, [context, handleSetAudioCatchIsPlay, handleCrane, dollIsCaught])
+    }, [context, 
+        handleSetAudioCatchIsPlay, 
+        handleCrane, 
+        dollIsCaught,
+        craneMinMoveX,
+        craneMaxMoveX,
+        craneMinMoveY,
+        craneMaxMoveY,
+        ratio])
     
     return (
         <canvas

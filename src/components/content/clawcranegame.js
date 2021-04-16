@@ -17,13 +17,34 @@ export default function ClawCraneGame() {
     const audioCatchContext = useRef();
     const audioSuccess = useRef();
     const audioSuccessContext = useRef();
+    const audioFail = useRef();
+    const audioFailContext = useRef();
     const buttonLeft = useRef();
     const buttonDown = useRef();
     const buttonRight = useRef();
+    const craneMinMoveX = useRef(-80);
+    const craneMaxMoveX = useRef(80);
+    const craneMinMoveY = useRef(0);
+    const craneMaxMoveY = useRef(100);
+    const ratio = useRef(1.5);
 
     // [오디오 : 메인]
+    const audioMainStop = useCallback(() => {
+        if(audioMainContext.current && audioMainContext.current.state === 'running') {
+            audioMainContext.current.suspend().then(() => {
+                if(audioMain.current) {
+                    console.info('music stop main theme');
+                    audioMain.current.pause();
+                    audioMain.current.currentTime = 0;
+                }
+            });
+        }
+    }, []);
     const audioMainPlay = useCallback(() => {
         if(typeof audioMainContext.current === 'undefined') {
+            audioMain.current.addEventListener('ended', (event) => {
+                audioMainStop();
+            });
             audioMainContext.current = new AudioContext();
             const destination = audioMainContext.current.destination;
             const source = audioMainContext.current.createMediaElementSource(audioMain.current);
@@ -45,21 +66,25 @@ export default function ClawCraneGame() {
                 }
             });
         }
-    }, []);
-    const audioMainStop = useCallback(() => {
-        if(audioMainContext.current && audioMainContext.current.state === 'running') {
-            audioMainContext.current.suspend().then(() => {
-                if(audioMain.current) {
-                    audioMain.current.pause();
-                    audioMain.current.currentTime = 0;
+    }, [audioMainStop]);
+
+    // [오디오 : 잡기]
+    const audioCatchStop = useCallback(() => {
+        if(audioCatchContext.current && audioCatchContext.current.state === 'running') {
+            audioCatchContext.current.suspend().then(() => {
+                if(audioCatch.current) {
+                    console.info('music stop catch theme');
+                    audioCatch.current.pause();
+                    audioCatch.current.currentTime = 0;
                 }
             });
         }
     }, []);
-
-    // [오디오 : 잡기]
     const audioCatchPlay = useCallback(() => {
         if(typeof audioCatchContext.current === 'undefined') {
+            audioCatch.current.addEventListener('ended', (event) => {
+                audioCatchStop();
+            });
             audioCatchContext.current = new AudioContext();
             const destination = audioCatchContext.current.destination;
             const source = audioCatchContext.current.createMediaElementSource(audioCatch.current);
@@ -73,28 +98,32 @@ export default function ClawCraneGame() {
                 const promise = audioCatch.current.play();
                 if (typeof promise === 'object') {
                     promise.then(_ => {
-                        console.info('music play main theme');
+                        console.info('music play catch theme');
                     }).catch(error => {
                         console.log(error);
                     });
                 }
             });
         }
-    }, []);
-    const audioCatchStop = useCallback(() => {
-        if(audioCatchContext.current && audioCatchContext.current.state === 'running') {
-            audioCatchContext.current.suspend().then(() => {
-                if(audioCatch.current) {
-                    audioCatch.current.pause();
-                    audioCatch.current.currentTime = 0;
+    }, [audioCatchStop]);
+
+    // [오디오 : 성공]
+    const audioSuccessStop = useCallback(() => {
+        if(audioSuccessContext.current && audioSuccessContext.current.state === 'running') {
+            audioSuccessContext.current.suspend().then(() => {
+                if(audioSuccess.current) {
+                    console.info('music stop success theme');
+                    audioSuccess.current.pause();
+                    audioSuccess.current.currentTime = 0;
                 }
             });
         }
     }, []);
-
-    // [오디오 : 성공]
     const audioSuccessPlay = useCallback(() => {
         if(typeof audioSuccessContext.current === 'undefined') {
+            audioSuccess.current.addEventListener('ended', (event) => {
+                audioSuccessStop();
+            });
             audioSuccessContext.current = new AudioContext();
             const destination = audioSuccessContext.current.destination;
             const source = audioSuccessContext.current.createMediaElementSource(audioSuccess.current);
@@ -107,26 +136,62 @@ export default function ClawCraneGame() {
                 const promise = audioSuccess.current.play();
                 if (typeof promise === 'object') {
                     promise.then(_ => {
-                        console.info('music play main theme');
+                        console.info('music play success theme');
                     }).catch(error => {
                         console.log(error);
                     });
                 }
             });
         }
-    }, []);
-    const audioSuccessStop = useCallback(() => {
-        if(audioSuccessContext.current && audioSuccessContext.current.state === 'running') {
-            audioSuccessContext.current.suspend().then(() => {
-                if(audioSuccess.current) {
-                    audioSuccess.current.pause();
-                    audioSuccess.current.currentTime = 0;
+    }, [audioSuccessStop]);
+
+    // [오디오 : 실패]
+    const audioFailStop = useCallback(() => {
+        if(audioFailContext.current && audioFailContext.current.state === 'running') {
+            audioFailContext.current.suspend().then(() => {
+                if(audioFail.current) {
+                    console.info('music stop fail theme');
+                    audioFail.current.pause();
+                    audioFail.current.currentTime = 0;
                 }
             });
         }
     }, []);
+    const audioFailPlay = useCallback(() => {
+        if(typeof audioFailContext.current === 'undefined') {
+            audioFail.current.addEventListener('ended', (event) => {
+                audioFailStop();
+            });
+            audioFailContext.current = new AudioContext();
+            const destination = audioFailContext.current.destination;
+            const source = audioFailContext.current.createMediaElementSource(audioFail.current);
+            const gain = audioFailContext.current.createGain();
+            source.connect(gain).connect(destination);
+            audioFailContext.current.suspend();
+        }
+        if(audioFailContext.current && audioFailContext.current.state === 'suspended') {
+            audioFailContext.current.resume().then(() => {
+                const promise = audioFail.current.play();
+                if (typeof promise === 'object') {
+                    promise.then(_ => {
+                        console.info('music play fail theme');
+                    }).catch(error => {
+                        console.log(error);
+                    });
+                }
+            });
+        }
+    }, [audioFailStop]);
 
+    // [오디오 : 전체]
+    const audioAllStop = useCallback(() => {
+        audioMainStop();
+        audioCatchStop();
+        audioSuccessStop();
+        audioFailStop();
+    }, [audioMainStop, audioCatchStop, audioSuccessStop, audioFailStop]);
 
+    
     // [useCallback : 함수 재사용(리렌더링에 영향없이 함수를 일회만 생성)]
     const handleCrane = useCallback((craneDirection, craneMoveX, craneMoveY, progress) => {
         setCraneDirection(craneDirection);
@@ -149,20 +214,39 @@ export default function ClawCraneGame() {
     const animationCrane = useCallback(() => { 
         return {craneDirection: craneDirection, craneMoveX: craneMoveX, craneMoveY: craneMoveY, progress: progress}
     }, [craneDirection, craneMoveX, craneMoveY, progress]);
+    const audioCaughtIsPlay = useCallback(() => {
+        if(craneDirection === 'stop') {
+            if(dollIsCaught && !craneIsCatch) { // 인형이 잡혔을 경우
+                audioAllStop();
+                audioSuccessPlay();
+                setTimeout(() => {
+                    audioAllStop();
+                    navigate('/animation/01'); 
+                }, 3000);
+            } else if(!dollIsCaught && !craneIsCatch) {
+                audioAllStop();
+                audioFailPlay();
+            }
+        }
+    }, [craneDirection,
+        dollIsCaught,
+        craneIsCatch, 
+        audioSuccessPlay, 
+        audioFailPlay,
+        audioAllStop]);
 
     useEffect(() => {
         const handleKeydown = (event) => {
             if(event.keyCode === 39) { // Right
                 buttonRight.current.classList.add(style.clawcranegame__keyItemActive);
-                // TODO. 해당 부분에 대한 문제점 검토
-                if(dollIsCaught === false) audioMainPlay();
+                if(!dollIsCaught && !craneIsCatch) audioMainPlay();
             } else if(event.keyCode === 37) { // Left
                 buttonLeft.current.classList.add(style.clawcranegame__keyItemActive);
-                if(dollIsCaught === false) audioMainPlay();
+                if(!dollIsCaught && !craneIsCatch) audioMainPlay();
             }
             if(event.keyCode === 40) { // Down
                 buttonDown.current.classList.add(style.clawcranegame__keyItemActive);
-                audioMainStop();
+                audioAllStop();
             }
         }
 
@@ -183,26 +267,7 @@ export default function ClawCraneGame() {
             }
         }
 
-        // [오디오 : 전체]
-        const audioAllStop = () => {
-            audioMainStop();
-            audioCatchStop();
-            audioSuccessStop();
-        }
-
-        // [초기화 : 인형을 뽑았을 경우(Success)]
-        const initDollIsCaught = () => {
-            if(dollIsCaught) { // 인형이 잡혔을 경우
-                audioCatchStop();
-                audioSuccessPlay();
-                setTimeout(() => { 
-                    audioAllStop();
-                    navigate('/animation/01'); 
-                }, 3000); 
-            }
-        }
-
-        initDollIsCaught();
+        audioCaughtIsPlay();
         window.addEventListener('keydown', handleKeydown);
         window.addEventListener('keyup', handleKeyUp);
         window.addEventListener("contextmenu", e => e.preventDefault());
@@ -210,14 +275,17 @@ export default function ClawCraneGame() {
         window.addEventListener("selectstart", e => e.preventDefault());
 
         return() => {
-            audioAllStop();
             window.removeEventListener('keydown', handleKeydown);
             window.removeEventListener('keyup', handleKeyUp);
             window.removeEventListener("contextmenu", e => e.preventDefault());
             window.removeEventListener("dragstart", e => e.preventDefault());
             window.removeEventListener("selectstart", e => e.preventDefault());
         }
-    }, [dollIsCaught, audioMainPlay, audioMainStop, audioCatchPlay, audioCatchStop, audioSuccessPlay, audioSuccessStop])
+    }, [dollIsCaught,
+        craneIsCatch,
+        audioCaughtIsPlay,
+        audioAllStop,
+        audioMainPlay])
 
     // [이벤트 : 핸들러]
     const handleTouchStartLeft = (event) => {
@@ -245,11 +313,18 @@ export default function ClawCraneGame() {
             <CanvasCrawCrane 
                 handleSetAudioCatchIsPlay={handleSetAudioCatchIsPlay}
                 handleCrane={handleCrane}
-                dollIsCaught={dollIsCaught} />
+                dollIsCaught={dollIsCaught}
+                craneMinMoveX={craneMinMoveX.current}
+                craneMaxMoveX={craneMaxMoveX.current}
+                craneMinMoveY={craneMinMoveY.current}
+                craneMaxMoveY={craneMaxMoveY.current}
+                ratio={ratio.current} />
             <CanvasDollLittlePrincess 
                 craneIsCatch={craneIsCatch}
                 animationCrane={animationCrane}
-                handleSetDollIsCaught={handleSetDollIsCaught} />
+                handleSetDollIsCaught={handleSetDollIsCaught}
+                craneMaxMoveY={craneMaxMoveY.current}
+                ratio={ratio.current} />
             <div
                 className={style.clawcranegame__keyWrap}>
                 <button
@@ -310,6 +385,12 @@ export default function ClawCraneGame() {
                 ref={audioSuccess}>
                 <source src="/crawcranegame_success.ogg" type="audio/ogg" />
                 <source src="/crawcranegame_success.mp3" type="audio/mpeg" />
+                <track src="/common.vtt" kind="captions" srcLang="ko" label="Korea" />
+            </audio>
+            <audio
+                ref={audioFail}>
+                <source src="/crawcranegame_fail.ogg" type="audio/ogg" />
+                <source src="/crawcranegame_fail.mp3" type="audio/mpeg" />
                 <track src="/common.vtt" kind="captions" srcLang="ko" label="Korea" />
             </audio>
         </div>
