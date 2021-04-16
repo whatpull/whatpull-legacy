@@ -215,19 +215,22 @@ export default function ClawCraneGame() {
         return {craneDirection: craneDirection, craneMoveX: craneMoveX, craneMoveY: craneMoveY, progress: progress}
     }, [craneDirection, craneMoveX, craneMoveY, progress]);
     const audioCaughtIsPlay = useCallback(() => {
-        audioCatchStop();
-        if(dollIsCaught && !craneIsCatch) {
-            audioSuccessPlay();
-            setTimeout(() => {
-                audioAllStop();
-                navigate('/animation/01'); 
-            }, 5000);
-        } else if(!dollIsCaught && !craneIsCatch) {
-            audioFailPlay();
+        if(craneDirection === 'stop') {
+            audioCatchStop();
+            if(dollIsCaught && !craneIsCatch) {
+                audioSuccessPlay();
+                setTimeout(() => {
+                    audioAllStop();
+                    navigate('/animation/01'); 
+                }, 5000);
+            } else if(!dollIsCaught && !craneIsCatch) {
+                audioFailPlay();
+            }
         }
     }, [dollIsCaught,
         craneIsCatch,
-        audioSuccessPlay, 
+        craneDirection,
+        audioSuccessPlay,
         audioFailPlay,
         audioCatchStop,
         audioAllStop]);
