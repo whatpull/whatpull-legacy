@@ -120,7 +120,7 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay,
             const radius = 6;
             const type = 'fill';
 
-            drawRoundedRectangle(x + 5, y + 5, width, height, radius, type, '#121212', 0.1);
+            drawRoundedRectangle(x + 5, y + 2, width, height, radius, type, '#121212', 0.1);
             drawRoundedRectangle(x, y, width, height, radius, type, '#009688', 1);
 
             drawClawCraneGameCeiling(centerX, centerY);
@@ -403,25 +403,34 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay,
             const height = 25;
             const x = centerX - (width / 2);
             const y = centerY - (height / 2) + 240;
-            const radius = 2;
+            const radius = 6;
             const type = 'fill';
-            drawRoundedRectangle(x+1, y-2, width-2, height, radius, type, '#121212', 0.1);
-            drawRoundedRectangle(x, y, width, height, radius, type, '#121212', 1);
+            drawRoundedRectangle(x, y - 5, width, height, radius, type, '#121212', 0.1);
+            drawRoundedRectangle(x, y, width, height, {
+                topRight: 0,
+                bottomRight: radius,
+                bottomLeft: radius,
+                topLeft: 0
+            }, type, '#121212', 1);
         }
 
         /** @param {*} type (타입 : line(선), fill(채우기)) */
         const drawRoundedRectangle = (x, y, width, height, radius, type, color, alpha) => {
+            const topRight = typeof radius === 'number' ? radius : radius.topRight;
+            const bottomRight = typeof radius === 'number' ? radius : radius.bottomRight;
+            const bottomLeft = typeof radius === 'number' ? radius : radius.bottomLeft;
+            const topLeft = typeof radius === 'number' ? radius : radius.topLeft;
             context.save();
             context.beginPath();
-            context.moveTo(x + (radius * 2), y);
-            context.arcTo(x + width, y, x + width, y + (radius * 2), radius); // top, right
-            context.lineTo(x + width, y + (radius * 2));
-            context.arcTo(x + width, y + height, x + width - (radius * 2), y + height, radius); // bottom, right
-            context.lineTo(x + width - (radius * 2), y + height);
-            context.arcTo(x, y + height, x, y + height - (radius * 2), radius); // bottom, left
-            context.lineTo(x, y + height - (radius * 2));
-            context.arcTo(x, y, x + (radius * 2), y, radius); // top, left
-            context.lineTo(x + (radius * 2), y);
+            context.moveTo(x + (topRight * 2), y);
+            context.arcTo(x + width, y, x + width, y + (topRight * 2), topRight); // top, right
+            context.lineTo(x + width, y + (topRight * 2));
+            context.arcTo(x + width, y + height, x + width - (bottomRight * 2), y + height, bottomRight); // bottom, right
+            context.lineTo(x + width - (bottomRight * 2), y + height);
+            context.arcTo(x, y + height, x, y + height - (bottomLeft * 2), bottomLeft); // bottom, left
+            context.lineTo(x, y + height - (bottomLeft * 2));
+            context.arcTo(x, y, x + (topLeft * 2), y, topLeft); // top, left
+            context.lineTo(x + (topLeft * 2), y);
             if(typeof alpha === "number") context.globalAlpha = alpha;
             if(type === 'fill') {
                 context.fillStyle = color;
