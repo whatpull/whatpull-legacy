@@ -222,7 +222,7 @@ export default function ClawCraneGame() {
                 setTimeout(() => {
                     audioAllStop();
                     navigate('/animation/01'); 
-                }, 3000);
+                }, 5000);
             } else if(!dollIsCaught && !craneIsCatch) {
                 audioAllStop();
                 audioFailPlay();
@@ -246,7 +246,7 @@ export default function ClawCraneGame() {
             }
             if(event.keyCode === 40) { // Down
                 buttonDown.current.classList.add(style.clawcranegame__keyItemActive);
-                audioAllStop();
+                audioMainStop();
             }
         }
 
@@ -284,8 +284,8 @@ export default function ClawCraneGame() {
     }, [dollIsCaught,
         craneIsCatch,
         audioCaughtIsPlay,
-        audioAllStop,
-        audioMainPlay])
+        audioMainPlay,
+        audioMainStop])
 
     // [이벤트 : 핸들러]
     const handleTouchStartLeft = (event) => {
