@@ -181,7 +181,7 @@ export default function ClawCraneGame() {
                 }
             });
         }
-    }, [audioFailStop, ]);
+    }, [audioFailStop]);
 
     // [오디오 : 전체]
     const audioAllStop = useCallback(() => {
@@ -230,7 +230,6 @@ export default function ClawCraneGame() {
         audioSuccessPlay, 
         audioFailPlay,
         audioCatchStop,
-        audioFailStop,
         audioAllStop]);
 
     useEffect(() => {
