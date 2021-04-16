@@ -43,7 +43,7 @@ export default function ClawCraneGame() {
     const audioMainPlay = useCallback(() => {
         if(typeof audioMainContext.current === 'undefined') {
             audioMain.current.addEventListener('ended', (event) => {
-                audioMainStop();
+                setTimeout(audioMainStop, 2000);
             });
             audioMainContext.current = new AudioContext();
             const destination = audioMainContext.current.destination;
@@ -83,7 +83,7 @@ export default function ClawCraneGame() {
     const audioCatchPlay = useCallback(() => {
         if(typeof audioCatchContext.current === 'undefined') {
             audioCatch.current.addEventListener('ended', (event) => {
-                audioCatchStop();
+                setTimeout(audioCatchStop, 2000);
             });
             audioCatchContext.current = new AudioContext();
             const destination = audioCatchContext.current.destination;
@@ -122,7 +122,7 @@ export default function ClawCraneGame() {
     const audioSuccessPlay = useCallback(() => {
         if(typeof audioSuccessContext.current === 'undefined') {
             audioSuccess.current.addEventListener('ended', (event) => {
-                audioSuccessStop();
+                setTimeout(audioSuccessStop, 2000);
             });
             audioSuccessContext.current = new AudioContext();
             const destination = audioSuccessContext.current.destination;
@@ -160,7 +160,7 @@ export default function ClawCraneGame() {
     const audioFailPlay = useCallback(() => {
         if(typeof audioFailContext.current === 'undefined') {
             audioFail.current.addEventListener('ended', (event) => {
-                audioFailStop();
+                setTimeout(audioFailStop, 2000);
             });
             audioFailContext.current = new AudioContext();
             const destination = audioFailContext.current.destination;
@@ -181,7 +181,7 @@ export default function ClawCraneGame() {
                 }
             });
         }
-    }, [audioFailStop]);
+    }, [audioFailStop, ]);
 
     // [오디오 : 전체]
     const audioAllStop = useCallback(() => {
@@ -215,24 +215,22 @@ export default function ClawCraneGame() {
         return {craneDirection: craneDirection, craneMoveX: craneMoveX, craneMoveY: craneMoveY, progress: progress}
     }, [craneDirection, craneMoveX, craneMoveY, progress]);
     const audioCaughtIsPlay = useCallback(() => {
-        if(craneDirection === 'stop') {
-            if(dollIsCaught && !craneIsCatch) { // 인형이 잡혔을 경우
+        audioCatchStop();
+        if(dollIsCaught && !craneIsCatch) {
+            audioSuccessPlay();
+            setTimeout(() => {
                 audioAllStop();
-                audioSuccessPlay();
-                setTimeout(() => {
-                    audioAllStop();
-                    navigate('/animation/01'); 
-                }, 5000);
-            } else if(!dollIsCaught && !craneIsCatch) {
-                audioAllStop();
-                audioFailPlay();
-            }
+                navigate('/animation/01'); 
+            }, 5000);
+        } else if(!dollIsCaught && !craneIsCatch) {
+            audioFailPlay();
         }
-    }, [craneDirection,
-        dollIsCaught,
-        craneIsCatch, 
+    }, [dollIsCaught,
+        craneIsCatch,
         audioSuccessPlay, 
         audioFailPlay,
+        audioCatchStop,
+        audioFailStop,
         audioAllStop]);
 
     useEffect(() => {

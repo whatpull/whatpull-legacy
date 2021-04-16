@@ -504,8 +504,22 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay,
                 craneMoveX.current = Math.max(craneMoveX.current - progress * 0.001, craneMinMoveX);
             }
 
-            drawClawCraneGameGlass(centerX.current, centerY.current);
-            handleCrane(craneDirection.current, craneMoveX.current, craneMoveY.current, progress);
+            if(craneDirection.current === 'stop') {
+                cancelAnimation();
+                setTimeout(() => { // 법칙성에 대해서 공부, 병렬처리할 경우 문제가 없는 부분에 대해 연구(스택으로 우선순위 밀림)
+                    handleSetAudioCatchIsPlay(false);
+                    handleCrane(craneDirection.current, craneMoveX.current, craneMoveY.current, progress);
+                }, 0);
+                downbuttonDirection.current = undefined;
+                downbuttonAnimationSpeed.current = 1;
+                drawClawCraneGameControlBox(centerX.current, centerY.current, 0, 0);
+                drawClawCraneGameGlass(centerX.current, centerY.current);
+                handleCrane(craneDirection.current, craneMoveX.current, craneMoveY.current, progress);
+            } else {
+                drawClawCraneGameGlass(centerX.current, centerY.current);
+                handleCrane(craneDirection.current, craneMoveX.current, craneMoveY.current, progress);
+                startAnimation(animateCraneCatch);
+            }
 
             // 크레인 이동 방향 설정
             if(craneMoveY.current === craneMaxMoveY) {
@@ -516,18 +530,6 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay,
                 } else {
                     craneDirection.current = 'left';
                 }
-            }
-
-            if(craneDirection.current === 'stop') {
-                handleSetAudioCatchIsPlay(false);
-                downbuttonDirection.current = undefined;
-                downbuttonAnimationSpeed.current = 1;
-                drawClawCraneGameControlBox(centerX.current, centerY.current, 0, 0);
-                drawClawCraneGameGlass(centerX.current, centerY.current);
-                cancelAnimation();
-                handleCrane(craneDirection.current, craneMoveX.current, craneMoveY.current);
-            } else {
-                startAnimation(animateCraneCatch);
             }
         }
 
