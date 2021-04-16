@@ -70,7 +70,7 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay,
                 context.restore();
             }
             const drawClawCraneGameHeadGlass = (fillColor) => {
-                const glassWidth = 260;
+                const glassWidth = 240;
                 const glassHeight = 25;
                 const glassDistance = glassHeight;
                 const glassX = centerX - (glassWidth / 2);
@@ -88,7 +88,7 @@ export default function CanvasCrawCrane({ handleSetAudioCatchIsPlay,
                 context.restore();
             }
             const drawClawCraneGameHeadCraneLine = () => {
-                const lineWidth = 250 + 2;
+                const lineWidth = 230 + 2;
                 const lineHeight = 5;
                 const lineDistance = lineHeight;
                 const lineX = centerX - (lineWidth / 2);
