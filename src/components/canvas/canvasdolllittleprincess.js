@@ -1,7 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import * as style from './canvasdolllittleprincess.module.css';
 
-export default function CanvasDollLittlePrincess({ craneIsCatch, 
+// type: scene, [default]: main(clawcranegame - else) 사용타입
+// type(scene) - position [x, y]; 이동좌표
+// TODO. 자세, 모션 등 애니메이션 추가 개발
+export default function CanvasDollLittlePrincess({ type,
+                                                    position,
+                                                    craneIsCatch, 
                                                     animationCrane, 
                                                     handleSetDollIsCaught,
                                                     craneMaxMoveY,
@@ -45,6 +50,10 @@ export default function CanvasDollLittlePrincess({ craneIsCatch,
 
             let x = centerX.current;
             let y = centerY.current - bodyRadius - bodyHeight;
+            if(type === 'scene' && typeof position === 'object') {
+                x = x + position.x;
+                y = y + position.y;
+            }
             const absX = 5;
             context.save();
             context.beginPath();
@@ -72,17 +81,19 @@ export default function CanvasDollLittlePrincess({ craneIsCatch,
             drawDollBody(x, y, headRadius, hairRadius, neckHeight, bodyRadius, bodyHeight);
             drawDollNeck(x, y, headRadius, neckHeight);
             context.restore();
-            drawClawCraneGameGlass(centerX.current, centerY.current);
+            if(typeof type === 'undefined') drawClawCraneGameGlass(centerX.current, centerY.current);
         }
 
         const drawDollHead = (centerX, centerY, headRadius, hairRadius) => {
             const radius = headRadius;
             const x = centerX;
             const y = centerY;
+            let hairColor = '#121212';
+            if(type === 'scene') hairColor = '#FFFFFF'; // 머리카락색상(흰색)
 
-            drawDollBackHair(radius, x, y, hairRadius);
+            drawDollBackHair(radius, x, y, hairRadius, hairColor);
             drawDollFace(radius, x, y);
-            drawDollFrontHair(radius, x, y);
+            drawDollFrontHair(radius, x, y, hairColor);
         }
 
         const drawDollFace = (faceRadius, faceX, faceY) => {
@@ -108,13 +119,13 @@ export default function CanvasDollLittlePrincess({ craneIsCatch,
             drawDollEye('left');
         }
 
-        const drawDollBackHair = (faceRadius, faceX, faceY, hairRadius) => {
+        const drawDollBackHair = (faceRadius, faceX, faceY, hairRadius, hairColor) => {
             const radius = faceRadius + hairRadius;
 
             context.save();
             context.beginPath();
             context.arc(faceX, faceY, radius, Math.PI, Math.PI * 2, false);
-            context.fillStyle = '#121212';
+            context.fillStyle = hairColor;
             context.fill();
             context.restore();
 
@@ -135,12 +146,12 @@ export default function CanvasDollLittlePrincess({ craneIsCatch,
             context.bezierCurveTo((x + radius * 2) + 3, y + radius * 1.5 + 10, (x + radius * 2) + 4, y + radius * 1.5 + 5, (x + radius * 2) + 1, y + radius * 1.5);
             context.bezierCurveTo((x + radius * 2) + 1, y + radius * 1.5, (x + radius * 2) + 3, y + radius * 1.075, (x + radius * 2), y + radius * 0.75);
             context.bezierCurveTo((x + radius * 2), y + radius * 0.75, (x + radius * 2) + 2, y + radius * 0.325, (x + radius * 2), y);
-            context.fillStyle = '#121212';
+            context.fillStyle = hairColor;
             context.fill();
             context.restore();
         }
 
-        const drawDollFrontHair = (faceRadius, faceX, faceY) => {
+        const drawDollFrontHair = (faceRadius, faceX, faceY, hairColor) => {
             context.save();
             context.beginPath();
             context.arc(faceX, faceY, faceRadius, Math.PI * 0, Math.PI * 1, true);
@@ -148,7 +159,7 @@ export default function CanvasDollLittlePrincess({ craneIsCatch,
             context.fillStyle = '#FFFFFF';
             context.fill();
             context.lineWidth = 3;
-            context.strokeStyle = '#121212';
+            context.strokeStyle = hairColor;
             context.stroke();
             context.restore();
 
@@ -156,7 +167,7 @@ export default function CanvasDollLittlePrincess({ craneIsCatch,
             context.beginPath();
             context.arc(faceX, faceY, faceRadius - 3, Math.PI * 0, Math.PI * 1, true);
             context.closePath();
-            context.fillStyle = '#121212';
+            context.fillStyle = hairColor;
             context.fill();
             context.restore();
 
@@ -170,7 +181,7 @@ export default function CanvasDollLittlePrincess({ craneIsCatch,
             context.stroke();
             context.restore();
 
-            drawRoundedRectangle(faceX - 5, faceY - 15, 10, 5, 0, 'fill', '#121212', 1);
+            drawRoundedRectangle(faceX - 5, faceY - 15, 10, 5, 0, 'fill', hairColor, 1);
         }
 
         const drawDollNeck = (centerX, centerY, headRadius, neckHeight) => {
@@ -369,7 +380,9 @@ export default function CanvasDollLittlePrincess({ craneIsCatch,
                 clearContext();
             }
         }
-    }, [context, 
+    }, [context,
+        type,
+        position,
         craneIsCatch, 
         animationCrane, 
         handleSetDollIsCaught,

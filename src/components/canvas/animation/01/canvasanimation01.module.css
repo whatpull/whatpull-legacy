@@ -6,4 +6,5 @@
     bottom: 0;
     width: 100%;
     height: calc(100% - 10px);
+    z-index: 2;
 }
